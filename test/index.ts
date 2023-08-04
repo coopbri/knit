@@ -1,6 +1,9 @@
-import * as fs from 'fs-extra'
 import { doesNotThrow, throws, deepEqual, ok, strictEqual } from 'assert'
 import { join } from 'path'
+
+import * as fs from 'fs-extra'
+import { accessSync, readFileSync, statSync } from 'fs-extra'
+
 import {
   addPackages,
   updatePackages,
@@ -9,10 +12,10 @@ import {
   knitGlobal,
   readPackageManifest,
 } from '../src'
-
 import { readInstallationsFile } from '../src/installations'
+import { readLockfile } from '../src/lockfile'
 
-import { readLockfile, LockFileConfigV1 } from '../src/lockfile'
+import type { LockFileConfigV1 } from '../src/lockfile'
 
 const values = {
   depPackage: 'dep-package',
@@ -67,10 +70,10 @@ const publishedPackage2Path = join(
 )
 
 const checkExists = (path: string) =>
-  doesNotThrow(() => fs.accessSync(path), path + ' does not exist')
+  doesNotThrow(() => accessSync(path), path + ' does not exist')
 
 const checkNotExists = (path: string) =>
-  throws(() => fs.accessSync(path), path + ' exists')
+  throws(() => accessSync(path), path + ' exists')
 
 const extractSignature = (lockfile: LockFileConfigV1, packageName: string) => {
   const packageEntry = lockfile.packages[packageName]
@@ -154,7 +157,7 @@ describe('Knit package manager', function () {
     it('it creates signature file', () => {
       const sigFileName = join(publishedPackagePath, 'knit.sig')
       checkExists(sigFileName)
-      ok(fs.statSync(sigFileName).size === 32, 'signature file size')
+      ok(statSync(sigFileName).size === 32, 'signature file size')
     })
 
     it('Adds signature to package.json version', () => {
@@ -169,9 +172,9 @@ describe('Knit package manager', function () {
     describe('signature consistency', () => {
       let expectedSignature: string
       before(() => {
-        expectedSignature = fs
-          .readFileSync(join(publishedPackagePath, 'knit.sig'))
-          .toString()
+        expectedSignature = readFileSync(
+          join(publishedPackagePath, 'knit.sig'),
+        ).toString()
       })
 
       beforeEach(() => {
@@ -185,7 +188,7 @@ describe('Knit package manager', function () {
       for (let tries = 1; tries <= 5; tries++) {
         it(`should have a consistent signature after every publish (attempt ${tries})`, () => {
           const sigFileName = join(publishedPackagePath, 'knit.sig')
-          const signature = fs.readFileSync(sigFileName).toString()
+          const signature = readFileSync(sigFileName).toString()
 
           deepEqual(signature, expectedSignature)
         })
@@ -249,7 +252,7 @@ describe('Knit package manager', function () {
   describe('Package 2 (without `files` in manifest) publish', () => {
     const publishedFilePath = join(publishedPackage2Path, 'file.txt')
 
-    const originalFilePath = join(depPackage2Dir, 'file.txt')
+    join(depPackage2Dir, 'file.txt')
     before(() => {
       console.time('Package2 publish')
       return publishPackage({

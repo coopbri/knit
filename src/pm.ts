@@ -1,6 +1,8 @@
-import { execSync, ExecSyncOptions } from 'child_process'
-import * as fs from 'fs-extra'
+import { execSync } from 'child_process'
 import { join } from 'path'
+
+import { existsSync } from 'fs-extra'
+
 import { execLoudOptions } from '.'
 
 type PackageMangerName = 'yarn' | 'npm' | 'pnpm'
@@ -38,8 +40,8 @@ export const getPackageManager = (cwd: string): PackageMangerName => {
       return (
         found ||
         (pmMarkFiles[pm].reduce<PackageMangerName | false>(
-          (found, file) => found || (fs.existsSync(join(cwd, file)) && pm),
-          false
+          (found, file) => found || (existsSync(join(cwd, file)) && pm),
+          false,
         ) &&
           pm)
       )
@@ -60,7 +62,7 @@ export const isYarn = (cwd: string) => getPackageManager(cwd) === 'yarn'
 
 export const runPmUpdate = (workingDir: string, packages: string[]) => {
   const pkgMgrCmd = [getPackageManagerUpdateCmd(workingDir), ...packages].join(
-    ' '
+    ' ',
   )
 
   console.log(`Running ${pkgMgrCmd} in ${workingDir}`)

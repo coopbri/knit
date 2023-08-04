@@ -1,6 +1,16 @@
 import { execSync } from 'child_process'
-import * as fs from 'fs-extra'
 import { join, relative } from 'path'
+
+import {
+  readdirSync,
+  statSync,
+  readlinkSync,
+  existsSync,
+  removeSync,
+  chmodSync,
+  ensureDirSync,
+  ensureSymlinkSync,
+} from 'fs-extra'
 
 import {
   execLoudOptions,
@@ -12,13 +22,12 @@ import {
   values,
   writePackageManifest,
 } from '.'
-import { addInstallations, removeInstallations } from './installations'
+import { addInstallations } from './installations'
 import { addPackageToLockfile } from './lockfile'
-import { PackageScripts } from './pkg'
 import { getPackageManager, pmRunScriptCmd } from './pm'
 import { copyDirSafe } from './sync-dir'
 
-const ensureSymlinkSync = fs.ensureSymlinkSync as typeof fs.symlinkSync
+import type { PackageScripts } from './pkg'
 
 export interface AddPackagesOptions {
   dev?: boolean
@@ -35,11 +44,11 @@ export interface AddPackagesOptions {
 
 const getLatestPackageVersion = (packageName: string) => {
   const dir = getPackageStoreDir(packageName)
-  const versions = fs.readdirSync(dir)
+  const versions = readdirSync(dir)
   const latest = versions
     .map((version) => ({
       version,
-      created: fs.statSync(join(dir, version)).ctime.getTime(),
+      created: statSync(join(dir, version)).ctime.getTime(),
     }))
     .sort((a, b) => b.created - a.created)
     .map((x) => x.version)[0]
@@ -48,14 +57,14 @@ const getLatestPackageVersion = (packageName: string) => {
 
 const isSymlink = (path: string) => {
   try {
-    return !!fs.readlinkSync(path)
+    return !!readlinkSync(path)
   } catch (e) {
     return false
   }
 }
 
 const checkPnpmWorkspace = (workingDir: string) => {
-  return fs.existsSync(join(workingDir, 'pnpm-workspace.yaml'))
+  return existsSync(join(workingDir, 'pnpm-workspace.yaml'))
 }
 
 export const addPackages = async (
@@ -104,7 +113,7 @@ export const addPackages = async (
 
     if (!options.restore) {
       const storedPackagePath = getPackageStoreDir(name)
-      if (!fs.existsSync(storedPackagePath)) {
+      if (!existsSync(storedPackagePath)) {
         console.warn(
           `Could not find package \`${name}\` in store (${storedPackagePath}), skipping.`,
         )
@@ -114,7 +123,7 @@ export const addPackages = async (
 
       const storedPackageDir = getPackageStoreDir(name, versionToInstall)
 
-      if (!fs.existsSync(storedPackageDir)) {
+      if (!existsSync(storedPackageDir)) {
         console.warn(
           `Could not find package \`${packageName}\` ` + storedPackageDir,
           ', skipping.',
@@ -125,7 +134,7 @@ export const addPackages = async (
       await copyDirSafe(storedPackageDir, destKnitCopyDir, !options.replace)
     } else {
       console.log(`Restoring package \`${packageName}\` from .knit directory`)
-      if (!fs.existsSync(destKnitCopyDir)) {
+      if (!existsSync(destKnitCopyDir)) {
         console.warn(
           `Could not find package \`${packageName}\` ` + destKnitCopyDir,
           ', skipping.',
@@ -163,7 +172,7 @@ export const addPackages = async (
     if (!doPure) {
       const destModulesDir = join(workingDir, 'node_modules', name)
       if (options.link || options.linkDep || isSymlink(destModulesDir)) {
-        fs.removeSync(destModulesDir)
+        removeSync(destModulesDir)
       }
 
       if (options.link || options.linkDep) {
@@ -222,17 +231,17 @@ export const addPackages = async (
           )
           try {
             ensureSymlinkSync(srcPath, destPath)
-            fs.chmodSync(srcPath, 0o755)
+            chmodSync(srcPath, 0o755)
           } catch (e) {
             console.warn('Could not create bin symlink.')
             console.error(e)
           }
         }
         if (typeof pkg.bin === 'string') {
-          fs.ensureDirSync(binDir)
+          ensureDirSync(binDir)
           addBinScript(pkg.bin, pkg.name)
         } else if (typeof pkg.bin === 'object') {
-          fs.ensureDirSync(binDir)
+          ensureDirSync(binDir)
           for (const name in pkg.bin) {
             addBinScript(pkg.bin[name], name)
           }

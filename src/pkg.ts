@@ -1,7 +1,9 @@
-import * as fs from 'fs-extra'
 import { join } from 'path'
-import { PackageName } from './installations'
+
 import detectIndent from 'detect-indent'
+import { readFileSync, writeFileSync } from 'fs-extra'
+
+import type { PackageName } from './installations'
 
 export type PackageScripts = Partial<{
   preinstall: string
@@ -57,7 +59,7 @@ export function readPackageManifest(workingDir: string) {
   let pkg: PackageManifest
   const packagePath = join(workingDir, 'package.json')
   try {
-    const fileData = fs.readFileSync(packagePath, 'utf-8')
+    const fileData = readFileSync(packagePath, 'utf-8')
     pkg = JSON.parse(fileData) as PackageManifest
     if (!pkg.name && pkg.version) {
       console.log(
@@ -97,7 +99,7 @@ export function writePackageManifest(workingDir: string, pkg: PackageManifest) {
   delete pkg.__Indent
   const packagePath = join(workingDir, 'package.json')
   try {
-    fs.writeFileSync(packagePath, JSON.stringify(pkg, null, indent) + '\n')
+    writeFileSync(packagePath, JSON.stringify(pkg, null, indent) + '\n')
   } catch (e) {
     console.error('Could not write ', packagePath)
   }

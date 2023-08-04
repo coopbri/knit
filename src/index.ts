@@ -1,8 +1,11 @@
-import { ExecSyncOptions } from 'child_process'
-import * as fs from 'fs-extra'
 import { homedir } from 'os'
 import { join } from 'path'
+
+import { readFileSync, writeFileSync } from 'fs-extra'
+
 import pkg from '../package.json'
+
+import type { ExecSyncOptions } from 'child_process'
 
 const userHome = homedir()
 
@@ -63,7 +66,7 @@ const signatureFileName = 'knit.sig'
 export const readSignatureFile = (workingDir: string) => {
   const signatureFilePath = join(workingDir, signatureFileName)
   try {
-    const fileData = fs.readFileSync(signatureFilePath, 'utf-8')
+    const fileData = readFileSync(signatureFilePath, 'utf-8')
     return fileData
   } catch (e) {
     return ''
@@ -73,7 +76,7 @@ export const readSignatureFile = (workingDir: string) => {
 export const readIgnoreFile = (workingDir: string) => {
   const filePath = join(workingDir, values.ignoreFileName)
   try {
-    const fileData = fs.readFileSync(filePath, 'utf-8')
+    const fileData = readFileSync(filePath, 'utf-8')
     return fileData
   } catch (e) {
     return ''
@@ -83,7 +86,7 @@ export const readIgnoreFile = (workingDir: string) => {
 export const writeSignatureFile = (workingDir: string, signature: string) => {
   const signatureFilePath = join(workingDir, signatureFileName)
   try {
-    fs.writeFileSync(signatureFilePath, signature)
+    writeFileSync(signatureFilePath, signature)
   } catch (e) {
     console.error('Could not write signature file')
     throw e

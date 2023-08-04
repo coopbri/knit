@@ -1,9 +1,13 @@
-import * as fs from 'fs-extra'
 import { execSync } from 'child_process'
 import * as path from 'path'
 import { join } from 'path'
-import { execLoudOptions, PackageManifest, values } from '.'
+
+import { readJSONSync } from 'fs-extra'
+
+import { execLoudOptions, values } from '.'
 import pkg from '../package.json'
+
+import type { PackageManifest } from '.'
 
 export type CheckOptions = {
   workingDir: string
@@ -18,7 +22,7 @@ const isPackageManifest = (fileName: string) =>
 
 export function checkManifest(options: CheckOptions) {
   const findLocalDepsInManifest = (manifestPath: string) => {
-    const pkg = fs.readJSONSync(manifestPath) as PackageManifest
+    const pkg = readJSONSync(manifestPath) as PackageManifest
     const addresMatch = new RegExp(
       `^(file|link):(.\\/)?\\${values.knitPackagesFolder}\\/`,
     )

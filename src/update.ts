@@ -1,7 +1,9 @@
 import { addPackages, parsePackageName } from '.'
-import { AddPackagesOptions } from './add'
-import { PackageInstallation, removeInstallations } from './installations'
+import { removeInstallations } from './installations'
 import { readLockfile } from './lockfile'
+
+import type { AddPackagesOptions } from './add'
+import type { PackageInstallation} from './installations';
 
 export interface UpdatePackagesOptions {
   workingDir: string
@@ -20,7 +22,7 @@ export const updatePackages = async (
   const lockfile = readLockfile({ workingDir })
 
   let packagesToUpdate: string[] = []
-  let installationsToRemove: PackageInstallation[] = []
+  const installationsToRemove: PackageInstallation[] = []
   if (packages.length) {
     packages.forEach((packageName) => {
       const { name, version } = parsePackageName(packageName)

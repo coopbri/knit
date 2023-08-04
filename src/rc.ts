@@ -1,5 +1,6 @@
-import fs from 'fs'
-import ini from 'ini'
+import { existsSync, readFileSync } from 'fs'
+
+import { parse } from 'ini'
 
 const validFlags = [
   'sig',
@@ -13,8 +14,8 @@ const validFlags = [
 const fileName = '.knitrc'
 
 const readFile = (): Record<string, string | boolean> | null => {
-  if (fs.existsSync(fileName)) {
-    return ini.parse(fs.readFileSync(fileName, 'utf-8'))
+  if (existsSync(fileName)) {
+    return parse(readFileSync(fileName, 'utf-8'))
   }
   return null
 }

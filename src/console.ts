@@ -1,4 +1,6 @@
-import chalk, { ChalkInstance } from 'chalk'
+import chalk from 'chalk'
+
+import type { ChalkInstance } from 'chalk';
 
 declare const console: any
 

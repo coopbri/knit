@@ -1,7 +1,11 @@
-import { glob } from 'glob'
 import { resolve } from 'path'
-import fs from 'fs-extra'
+
+import { copy, remove, stat } from 'fs-extra'
+import { glob } from 'glob'
+
 import { getFileHash } from './copy'
+
+import type { Stats } from 'fs-extra'
 
 const NODE_MAJOR_VERSION = parseInt(
   (<any>process).versions.node.split('.').shift(),
@@ -18,7 +22,7 @@ const cache: {
   [dir: string]: {
     glob: string[]
     files: {
-      [file: string]: { stat: fs.Stats; hash: string }
+      [file: string]: { stat: Stats; hash: string }
     }
   }
 } = {}
@@ -33,7 +37,7 @@ const makeListMap = (list: string[]) => {
   )
 }
 
-const theSameStats = (srcStat: fs.Stats, destStat: fs.Stats) => {
+const theSameStats = (srcStat: Stats, destStat: Stats) => {
   return (
     srcStat.mtime.getTime() === destStat.mtime.getTime() &&
     srcStat.size === destStat.size
@@ -71,9 +75,9 @@ export const copyDirSafe = async (
     srcCached[file] = srcCached[file] || {}
     const srcFilePath = resolve(srcDir, file)
     const destFilePath = resolve(destDir, file)
-    const srcFileStat = srcCached[file].stat || (await fs.stat(srcFilePath))
+    const srcFileStat = srcCached[file].stat || (await stat(srcFilePath))
     srcCached[file].stat = srcFileStat
-    const destFileStat = await fs.stat(destFilePath)
+    const destFileStat = await stat(destFilePath)
 
     const areDirs = srcFileStat.isDirectory() && destFileStat.isDirectory()
     dirsInDest[file] = destFileStat.isDirectory()
@@ -111,18 +115,18 @@ export const copyDirSafe = async (
   await Promise.all(
     filesToRemove
       .filter((file) => !dirsInDest[file])
-      .map((file) => fs.remove(resolve(destDir, file))),
+      .map((file) => remove(resolve(destDir, file))),
   )
   // then empty directories
   await Promise.all(
     filesToRemove
       .filter((file) => dirsInDest[file])
-      .map((file) => fs.remove(resolve(destDir, file))),
+      .map((file) => remove(resolve(destDir, file))),
   )
 
   const newFilesDirs = await Promise.all(
     newFiles.map((file) =>
-      fs.stat(resolve(srcDir, file)).then((stat) => stat.isDirectory()),
+      stat(resolve(srcDir, file)).then((stat) => stat.isDirectory()),
     ),
   )
 
@@ -130,6 +134,6 @@ export const copyDirSafe = async (
     newFiles
       .filter((file, index) => !newFilesDirs[index])
       .concat(filesToReplace)
-      .map((file) => fs.copy(resolve(srcDir, file), resolve(destDir, file))),
+      .map((file) => copy(resolve(srcDir, file), resolve(destDir, file))),
   )
 }

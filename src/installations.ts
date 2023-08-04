@@ -1,5 +1,7 @@
-import fs from 'fs-extra'
 import path from 'path'
+
+import { accessSync, readJsonSync, writeFile } from 'fs-extra'
+
 import { getStoreMainDir, values } from '.'
 import { readLockfile } from './lockfile'
 
@@ -21,9 +23,9 @@ export const readInstallationsFile = (): InstallationsFile => {
   let installationsConfig: InstallationsFile
 
   try {
-    fs.accessSync(installationFilePath)
+    accessSync(installationFilePath)
     try {
-      installationsConfig = fs.readJsonSync(installationFilePath)
+      installationsConfig = readJsonSync(installationFilePath)
     } catch (e) {
       console.error('Error reading installations file', installationFilePath, e)
       installationsConfig = {}
@@ -39,7 +41,7 @@ export const showInstallations = ({ packages }: { packages: string[] }) => {
   const config = readInstallationsFile()
   ;(Object.keys(config) as PackageName[])
     .filter((packageName) =>
-      packages.length ? packages.indexOf(packageName) >= 0 : true
+      packages.length ? packages.indexOf(packageName) >= 0 : true,
     )
     .map((name: PackageName) => ({ name, locations: config[name] }))
     .forEach(({ name, locations }) => {
@@ -60,7 +62,7 @@ export const cleanInstallations = async ({
   const config = readInstallationsFile()
   const installsToRemove = (Object.keys(config) as PackageName[])
     .filter((packageName) =>
-      packages.length ? packages.indexOf(packageName) >= 0 : true
+      packages.length ? packages.indexOf(packageName) >= 0 : true,
     )
     .map((name) => ({ name, locations: config[name] }))
     .reduce((list, { name, locations }) => {
@@ -93,16 +95,16 @@ export const cleanInstallations = async ({
 }
 
 export const saveInstallationsFile = async (
-  installationsConfig: InstallationsFile
+  installationsConfig: InstallationsFile,
 ) => {
   const storeDir = getStoreMainDir()
   const installationFilePath = path.join(storeDir, values.installationsFile)
   const data = JSON.stringify(installationsConfig, null, 2)
-  return fs.writeFile(installationFilePath, data)
+  return writeFile(installationFilePath, data)
 }
 
 export const addInstallations = async (
-  installations: PackageInstallation[]
+  installations: PackageInstallation[],
 ) => {
   const installationsConfig = readInstallationsFile()
   let updated = false
@@ -110,7 +112,7 @@ export const addInstallations = async (
     const packageInstallPaths = installationsConfig[newInstall.name] || []
     installationsConfig[newInstall.name] = packageInstallPaths
     const hasInstallation = !!packageInstallPaths.filter(
-      (p) => p === newInstall.path
+      (p) => p === newInstall.path,
     )[0]
     if (!hasInstallation) {
       updated = true
@@ -124,7 +126,7 @@ export const addInstallations = async (
 }
 
 export const removeInstallations = async (
-  installations: PackageInstallation[]
+  installations: PackageInstallation[],
 ) => {
   const installationsConfig = readInstallationsFile()
   let updated = false

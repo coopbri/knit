@@ -1,23 +1,24 @@
-import { exec, execSync } from 'child_process'
+import { execSync } from 'child_process'
 import { join } from 'path'
 
 import {
   execLoudOptions,
   getPackageManager,
   getStorePackagesDir,
-  PackageManifest,
-  PackageScripts,
   readPackageManifest,
   updatePackages,
-  values,
 } from '.'
 import { copyPackageToStore } from './copy'
 import {
-  PackageInstallation,
   readInstallationsFile,
   removeInstallations,
 } from './installations'
 import { pmRunScriptCmd } from './pm'
+
+import type {
+  PackageScripts} from '.';
+import type {
+  PackageInstallation} from './installations';
 
 export interface PublishPackageOptions {
   workingDir: string

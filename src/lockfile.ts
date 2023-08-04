@@ -1,5 +1,6 @@
-import * as fs from 'fs-extra'
 import { join } from 'path'
+
+import { removeSync, readJSONSync, writeFileSync } from 'fs-extra'
 
 import { values } from '.'
 
@@ -58,7 +59,7 @@ const getLockFileCurrentConfig = (lockFileConfig: any) => {
 
 export const removeLockfile = (options: { workingDir: string }) => {
   const lockfilePath = join(options.workingDir, values.lockfileName)
-  fs.removeSync(lockfilePath)
+  removeSync(lockfilePath)
 }
 
 export const readLockfile = (options: { workingDir: string }) => {
@@ -68,7 +69,7 @@ export const readLockfile = (options: { workingDir: string }) => {
     packages: {},
   }
   try {
-    lockfile = getLockFileCurrentConfig(fs.readJSONSync(lockfilePath))
+    lockfile = getLockFileCurrentConfig(readJSONSync(lockfilePath))
   } catch (e) {
     return lockfile
   }
@@ -77,21 +78,21 @@ export const readLockfile = (options: { workingDir: string }) => {
 
 export const writeLockfile = (
   lockfile: LockFileConfig,
-  options: { workingDir: string }
+  options: { workingDir: string },
 ) => {
   const lockfilePath = join(options.workingDir, values.lockfileName)
   const data = JSON.stringify(lockfile, null, 2)
-  fs.writeFileSync(lockfilePath, data)
+  writeFileSync(lockfilePath, data)
 }
 
 export const addPackageToLockfile = (
   packages: ({ name: string } & LockFilePackageEntry)[],
-  options: { workingDir: string }
+  options: { workingDir: string },
 ) => {
   const lockfile = readLockfile(options)
   packages.forEach(
     ({ name, version, file, link, replaced, signature, pure, workspace }) => {
-      let old = lockfile.packages[name] || {}
+      const old = lockfile.packages[name] || {}
       lockfile.packages[name] = {}
       if (version) {
         lockfile.packages[name].version = version
@@ -114,7 +115,7 @@ export const addPackageToLockfile = (
       if (replaced || old.replaced) {
         lockfile.packages[name].replaced = replaced || old.replaced
       }
-    }
+    },
   )
   writeLockfile(lockfile, options)
 }

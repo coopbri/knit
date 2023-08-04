@@ -1,12 +1,6 @@
-import * as fs from 'fs-extra'
 import { join } from 'path'
-import {
-  PackageInstallation,
-  removeInstallations,
-  PackageName,
-} from './installations'
 
-import { readLockfile, writeLockfile, removeLockfile } from './lockfile'
+import { existsSync, readdirSync, removeSync } from 'fs-extra'
 
 import {
   values,
@@ -14,6 +8,10 @@ import {
   readPackageManifest,
   writePackageManifest,
 } from '.'
+import { removeInstallations } from './installations'
+import { readLockfile, writeLockfile, removeLockfile } from './lockfile'
+
+import type { PackageInstallation, PackageName } from './installations'
 
 export interface RemovePackagesOptions {
   all?: boolean
@@ -29,9 +27,9 @@ const isKnitFileAddress = (address: string, name: string) => {
 }
 
 const removeIfEmpty = (folder: string) => {
-  const isEmpty = fs.existsSync(folder) && !fs.readdirSync(folder).length
+  const isEmpty = existsSync(folder) && !readdirSync(folder).length
   if (isEmpty) {
-    fs.removeSync(folder)
+    removeSync(folder)
   }
   return isEmpty
 }
@@ -119,11 +117,11 @@ export const removePackages = async (
 
   const knitFolder = join(workingDir, values.knitPackagesFolder)
   removedPackagedFromManifest.forEach((name) => {
-    fs.removeSync(join(workingDir, 'node_modules', name))
+    removeSync(join(workingDir, 'node_modules', name))
   })
   packagesToRemove.forEach((name) => {
     if (!options.retreat) {
-      fs.removeSync(join(knitFolder, name))
+      removeSync(join(knitFolder, name))
     }
   })
 

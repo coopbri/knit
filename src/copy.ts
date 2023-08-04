@@ -1,24 +1,28 @@
-// import { Node as ArboristNode } from '@npmcli/arborist'
-import Arborist from '@npmcli/arborist'
 import crypto from 'crypto'
-import fs from 'fs-extra'
-import ignore from 'ignore'
-import npmPacklist from 'npm-packlist'
 import { dirname, join } from 'path'
 
-import { readIgnoreFile, readPackageManifest, readSignatureFile } from '.'
+// eslint-disable-next-line import/no-named-as-default
+import Arborist from '@npmcli/arborist'
+import { createReadStream, copy, remove } from 'fs-extra'
+import ignore from 'ignore'
+import npmPacklist from 'npm-packlist'
+
 import {
+  readIgnoreFile,
+  readPackageManifest,
+  readSignatureFile,
   getStorePackagesDir,
-  PackageManifest,
   writePackageManifest,
   writeSignatureFile,
 } from '.'
+
+import type { PackageManifest } from '.'
 
 const shortSignatureLength = 8
 
 export const getFileHash = (srcPath: string, relPath: string = '') => {
   return new Promise<string>(async (resolve, reject) => {
-    const stream = fs.createReadStream(srcPath)
+    const stream = createReadStream(srcPath)
     const md5sum = crypto.createHash('md5')
     md5sum.update(relPath.replace(/\\/g, '/'))
     stream.on('data', (data: string) => md5sum.update(data))
@@ -33,7 +37,7 @@ const copyFile = async (
   destPath: string,
   relPath: string = '',
 ) => {
-  await fs.copy(srcPath, destPath)
+  await copy(srcPath, destPath)
   return getFileHash(srcPath, relPath)
 }
 
@@ -163,7 +167,7 @@ export const copyPackageToStore = async (options: {
     console.info(`Total ${filesToCopy.length} files.`)
   }
   const copyFilesToStore = async () => {
-    await fs.remove(storePackageStoreDir)
+    await remove(storePackageStoreDir)
     return Promise.all(
       filesToCopy
         .sort()

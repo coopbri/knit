@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-import yargs from 'yargs'
 import { join, resolve } from 'path'
-import pkg from '../package.json'
+
+import yargs from 'yargs'
 
 import {
   values,
@@ -12,13 +12,13 @@ import {
   getStoreMainDir,
   knitGlobal,
 } from '.'
-
-import { showInstallations, cleanInstallations } from './installations'
-
 import { checkManifest } from './check'
 import { makeConsoleColored, disabledConsoleOutput } from './console'
-import { PublishPackageOptions } from './publish'
+import { showInstallations, cleanInstallations } from './installations'
 import { readRcConfig } from './rc'
+import pkg from '../package.json'
+
+import type { PublishPackageOptions } from './publish'
 
 const updateFlags = ['update', 'upgrade', 'up']
 
@@ -62,7 +62,7 @@ const getPublishOptions = (
   }
 }
 
-yargs
+void yargs
   .usage(`🧶 ${cliCommand}` + ' [command] [options] [package1 [package2...]]')
   .coerce('store-folder', function (folder: string) {
     if (!knitGlobal.knitStoreMainDir) {
