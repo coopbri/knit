@@ -1,3 +1,5 @@
+// import { Node as ArboristNode } from '@npmcli/arborist'
+import Arborist from '@npmcli/arborist'
 import crypto from 'crypto'
 import fs from 'fs-extra'
 import ignore from 'ignore'
@@ -65,8 +67,7 @@ const resolveWorkspaceDepVersion = (
     const pkgPath = require.resolve(join(pkgName, 'package.json'), {
       paths: [workingDir],
     })
-    if (!pkgPath) {
-    }
+
     const resolved = readPackageManifest(dirname(pkgPath))?.version
 
     return `${prefix}${resolved}` || '*'
@@ -135,9 +136,8 @@ export const copyPackageToStore = async (options: {
   const { workingDir, devMod = true } = options
   const pkg = readPackageManifest(workingDir)
 
-  if (!pkg) {
-    throw 'Error copying package to store.'
-  }
+  if (!pkg) throw 'Error copying package to store.'
+
   const copyFromDir = options.workingDir
   const storePackageStoreDir = join(
     getStorePackagesDir(),
@@ -148,9 +148,11 @@ export const copyPackageToStore = async (options: {
   const ignoreFileContent = readIgnoreFile(workingDir)
 
   const ignoreRule = ignore().add(ignoreFileContent)
-  const npmList: string[] = await (
-    await npmPacklist({ path: workingDir })
-  ).map(fixScopedRelativeName)
+
+  const arborist = new Arborist({ path: workingDir })
+  const actual = await arborist.loadActual()
+
+  const npmList = (await npmPacklist(actual)).map(fixScopedRelativeName)
 
   const filesToCopy = npmList.filter((f) => !ignoreRule.ignores(f))
   if (options.content) {

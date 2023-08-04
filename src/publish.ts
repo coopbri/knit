@@ -37,9 +37,7 @@ export interface PublishPackageOptions {
 export const publishPackage = async (options: PublishPackageOptions) => {
   const workingDir = options.workingDir
   const pkg = readPackageManifest(workingDir)
-  if (!pkg) {
-    return
-  }
+  if (!pkg) return
 
   const pm = getPackageManager(workingDir)
 

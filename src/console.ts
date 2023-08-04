@@ -1,4 +1,4 @@
-import chalk, { Chalk } from 'chalk'
+import chalk, { ChalkInstance } from 'chalk'
 
 declare const console: any
 
@@ -35,7 +35,7 @@ export const makeConsoleColored = () => {
   overloadConsole({
     methods: ['log', 'warn', 'error', 'info'],
     output: ({ method, args, oldMethods }) => {
-      const fns: Record<string, Chalk> = {
+      const fns: Record<string, ChalkInstance> = {
         warn: chalk.yellowBright,
         info: chalk.blueBright,
         error: chalk.redBright,
@@ -43,7 +43,7 @@ export const makeConsoleColored = () => {
       const fn = fns[method] || ((arg: any) => arg)
 
       oldMethods[method](
-        ...args.map((arg) => (typeof arg === 'string' ? fn(arg) : arg))
+        ...args.map((arg) => (typeof arg === 'string' ? fn(arg) : arg)),
       )
     },
   })

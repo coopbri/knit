@@ -44,6 +44,7 @@ export const removePackages = async (
   const lockFileConfig = readLockfile({ workingDir: workingDir })
   const pkg = readPackageManifest(workingDir)
   if (!pkg) return
+
   let packagesToRemove: PackageName[] = []
 
   if (packages.length) {

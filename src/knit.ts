@@ -33,13 +33,6 @@ const publishFlags = [
 
 const cliCommand = values.myNameIs
 
-const getVersionMessage = () => {
-  // TODO use import above
-  // TODO replace all dynamic knit -> pkg.name
-  const pkg = require(__dirname + '/../package.json')
-  return pkg.version
-}
-
 makeConsoleColored()
 
 const rcArgs = readRcConfig()
@@ -69,7 +62,6 @@ const getPublishOptions = (
   }
 }
 
-/* tslint:disable-next-line */
 yargs
   .usage(`🧶 ${cliCommand}` + ' [command] [options] [package1 [package2...]]')
   .coerce('store-folder', function (folder: string) {
@@ -89,7 +81,7 @@ yargs
         msg = 'Unknown command `' + argv._[0] + '`. ' + msg
       } else {
         if (argv.version) {
-          msg = getVersionMessage()
+          msg = pkg.version
         }
       }
       console.log(msg)
@@ -138,7 +130,7 @@ yargs
     },
     handler: async (argv) => {
       const action = argv._[1]
-      const packages = argv._.slice(2)
+      const packages = argv._.slice(2) as string[]
       switch (action) {
         case 'show':
           showInstallations({ packages })
@@ -165,7 +157,7 @@ yargs
         .help(true)
     },
     handler: (argv) => {
-      return addPackages(argv._.slice(1), {
+      return addPackages(argv._.slice(1) as string[], {
         dev: argv.dev,
         linkDep: argv.link,
         restore: argv.restore,
@@ -183,7 +175,7 @@ yargs
       return yargs.default(rcArgs).help(true)
     },
     handler: (argv) => {
-      return addPackages(argv._.slice(1), {
+      return addPackages(argv._.slice(1) as string[], {
         link: true,
         pure: argv.pure,
         workingDir: process.cwd(),
@@ -199,8 +191,8 @@ yargs
         .default(rcArgs)
         .help(true)
     },
-    handler: (argv) => {
-      return updatePackages(argv._.slice(1), {
+    handler: async (argv) => {
+      await updatePackages(argv._.slice(1) as string[], {
         update: argv.update || argv.upgrade,
         restore: argv.restore,
         workingDir: process.cwd(),
@@ -216,8 +208,8 @@ yargs
         .default(rcArgs)
         .help(true)
     },
-    handler: (argv) => {
-      return updatePackages(argv._.slice(1), {
+    handler: async (argv) => {
+      await updatePackages(argv._.slice(1) as string[], {
         update: argv.update || argv.upgrade,
         restore: true,
         workingDir: process.cwd(),
@@ -231,7 +223,7 @@ yargs
       return yargs.boolean(['retreat', 'all']).default(rcArgs).help(true)
     },
     handler: (argv) => {
-      return removePackages(argv._.slice(1), {
+      return removePackages(argv._.slice(1) as string[], {
         retreat: argv.retreat,
         workingDir: process.cwd(),
         all: argv.all,
@@ -246,7 +238,7 @@ yargs
       return yargs.boolean(['all']).help(true)
     },
     handler: (argv) => {
-      return removePackages(argv._.slice(1), {
+      return removePackages(argv._.slice(1) as string[], {
         all: argv.all,
         retreat: true,
         workingDir: process.cwd(),

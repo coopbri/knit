@@ -1,5 +1,5 @@
 import fs from 'fs'
-const ini = require('ini')
+import ini from 'ini'
 
 const validFlags = [
   'sig',

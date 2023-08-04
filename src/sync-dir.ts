@@ -1,12 +1,11 @@
-import glob from 'glob'
-import util from 'util'
+import { glob } from 'glob'
 import { resolve } from 'path'
 import fs from 'fs-extra'
 import { getFileHash } from './copy'
 
 const NODE_MAJOR_VERSION = parseInt(
   (<any>process).versions.node.split('.').shift(),
-  10
+  10,
 )
 
 if (NODE_MAJOR_VERSION >= 8 && NODE_MAJOR_VERSION < 10) {
@@ -14,8 +13,6 @@ if (NODE_MAJOR_VERSION >= 8 && NODE_MAJOR_VERSION < 10) {
   ;(Symbol as any).asyncIterator =
     Symbol.asyncIterator || Symbol('Symbol.asyncIterator')
 }
-
-const globP = util.promisify(glob)
 
 const cache: {
   [dir: string]: {
@@ -27,10 +24,13 @@ const cache: {
 } = {}
 
 const makeListMap = (list: string[]) => {
-  return list.reduce((map, item) => {
-    map[item] = true
-    return map
-  }, {} as { [file: string]: true })
+  return list.reduce(
+    (map, item) => {
+      map[item] = true
+      return map
+    },
+    {} as { [file: string]: true },
+  )
 }
 
 const theSameStats = (srcStat: fs.Stats, destStat: fs.Stats) => {
@@ -43,15 +43,15 @@ const theSameStats = (srcStat: fs.Stats, destStat: fs.Stats) => {
 export const copyDirSafe = async (
   srcDir: string,
   destDir: string,
-  compareContent = true
+  compareContent = true,
 ) => {
   const ignore = '**/node_modules/**'
   const dot = true
   const nodir = false
   const srcList = cache[srcDir]
     ? cache[srcDir].glob
-    : await globP('**', { cwd: srcDir, ignore, dot, nodir })
-  const destList = await globP('**', { cwd: destDir, ignore, dot, nodir })
+    : await glob('**', { cwd: srcDir, ignore, dot, nodir })
+  const destList = await glob('**', { cwd: destDir, ignore, dot, nodir })
   const srcMap = makeListMap(srcList)
   const destMap = makeListMap(destList)
 
@@ -111,25 +111,25 @@ export const copyDirSafe = async (
   await Promise.all(
     filesToRemove
       .filter((file) => !dirsInDest[file])
-      .map((file) => fs.remove(resolve(destDir, file)))
+      .map((file) => fs.remove(resolve(destDir, file))),
   )
   // then empty directories
   await Promise.all(
     filesToRemove
       .filter((file) => dirsInDest[file])
-      .map((file) => fs.remove(resolve(destDir, file)))
+      .map((file) => fs.remove(resolve(destDir, file))),
   )
 
   const newFilesDirs = await Promise.all(
     newFiles.map((file) =>
-      fs.stat(resolve(srcDir, file)).then((stat) => stat.isDirectory())
-    )
+      fs.stat(resolve(srcDir, file)).then((stat) => stat.isDirectory()),
+    ),
   )
 
   await Promise.all(
     newFiles
       .filter((file, index) => !newFilesDirs[index])
       .concat(filesToReplace)
-      .map((file) => fs.copy(resolve(srcDir, file), resolve(destDir, file)))
+      .map((file) => fs.copy(resolve(srcDir, file), resolve(destDir, file))),
   )
 }

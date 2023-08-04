@@ -135,9 +135,7 @@ export const addPackages = async (
     }
 
     const pkg = readPackageManifest(destKnitCopyDir)
-    if (!pkg) {
-      return null
-    }
+    if (!pkg) return null
 
     let replacedVersion = ''
     if (doPure) {

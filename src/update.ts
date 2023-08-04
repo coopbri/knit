@@ -14,7 +14,7 @@ export interface UpdatePackagesOptions {
 }
 export const updatePackages = async (
   packages: string[],
-  options: UpdatePackagesOptions
+  options: UpdatePackagesOptions,
 ) => {
   const { workingDir } = options
   const lockfile = readLockfile({ workingDir })
@@ -33,7 +33,7 @@ export const updatePackages = async (
         installationsToRemove.push({ name, path: options.workingDir })
         console.warn(
           `Did not find package ${name} in lockfile, ` +
-            `please use 'add' command to add it explicitly.`
+            `please use 'add' command to add it explicitly.`,
         )
       }
     })
@@ -98,5 +98,6 @@ export const updatePackages = async (
   if (!options.noInstallationsRemove) {
     await removeInstallations(installationsToRemove)
   }
+
   return installationsToRemove
 }
