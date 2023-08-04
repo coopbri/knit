@@ -2,7 +2,7 @@
 
 > Streamline your local Node.js package dependency workflow.
 
-Knit is a fork of [yalc](https://github.com/wclr/yalc) which was created by `@wclr`, and the name is inspired by this GitHub [thread](https://github.com/yarnpkg/yarn/issues/1213).
+Knit is a fork of [yalc](https://github.com/wclr/yalc) which was created by [@wclr](https://github.com/wclr), and the name is inspired by this GitHub [thread](https://github.com/yarnpkg/yarn/issues/1213).
 
 ## Why
 
