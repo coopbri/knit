@@ -15,11 +15,7 @@ const coverageOptions: Pick<
   | "forceCoverageMatch"
 > = {
   coverageProvider: "v8",
-  collectCoverageFrom: [
-    "<rootDir>/src/**/*.tsx",
-    // ignore stories
-    "!<rootDir>/src/**/*.stories.tsx",
-  ],
+  collectCoverageFrom: ["<rootDir>/src/**/*.tsx"],
 };
 
 /**
