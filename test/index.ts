@@ -383,8 +383,8 @@ describe('Knit package manager', function () {
     })
 
     it('does not update installations file', () => {
-      const installtions = readInstallationsFile()
-      deepEqual(installtions, {
+      const installations = readInstallationsFile()
+      deepEqual(installations, {
         [values.depPackage]: [projectDir],
       })
     })
@@ -433,8 +433,8 @@ describe('Knit package manager', function () {
     })
 
     it('updates installations file', () => {
-      const installtions = readInstallationsFile()
-      deepEqual(installtions, {})
+      const installations = readInstallationsFile()
+      deepEqual(installations, {})
     })
     it('should remove package from .knit', () => {
       checkNotExists(join(projectDir, '.ylc', values.depPackage))
@@ -478,8 +478,8 @@ describe('Knit package manager', function () {
       })
     })
     it('create and updates installations file', () => {
-      const installtions = readInstallationsFile()
-      deepEqual(installtions, {
+      const installations = readInstallationsFile()
+      deepEqual(installations, {
         [values.depPackage]: [projectDir],
       })
     })
@@ -508,8 +508,8 @@ describe('Knit package manager', function () {
       })
     })
     it('create and updates installations file', () => {
-      const installtions = readInstallationsFile()
-      deepEqual(installtions, {
+      const installations = readInstallationsFile()
+      deepEqual(installations, {
         [values.depPackage]: [projectDir],
       })
     })
