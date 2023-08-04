@@ -1,10 +1,7 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "lib": [
-      "DOM",
-      "DOM.Iterable",
-    ],
+    "lib": ["DOM", "DOM.Iterable"],
     "module": "CommonJS",
     "declaration": true,
     "sourceMap": true,
@@ -24,12 +21,6 @@
     "indentSize": 2,
     "tabSize": 2
   },
-  "include": [
-    "src",
-    "*.config.ts",
-    "test"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["src", "*.config.ts", "test"],
+  "exclude": ["node_modules"]
 }

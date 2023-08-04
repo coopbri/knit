@@ -1,121 +1,121 @@
-import { join } from 'path'
+import { join } from "path";
 
-import { removeSync, readJSONSync, writeFileSync } from 'fs-extra'
+import { removeSync, readJSONSync, writeFileSync } from "fs-extra";
 
-import { values } from '.'
+import { values } from ".";
 
 export type LockFileConfigV0 = {
   [packageName: string]: {
-    version?: string
-    file?: boolean
-  }
-}
+    version?: string;
+    file?: boolean;
+  };
+};
 
 export type LockFilePackageEntry = {
-  version?: string
-  file?: boolean
-  link?: boolean
-  replaced?: string
-  signature?: string
-  pure?: boolean
-  workspace?: boolean
-}
+  version?: string;
+  file?: boolean;
+  link?: boolean;
+  replaced?: string;
+  signature?: string;
+  pure?: boolean;
+  workspace?: boolean;
+};
 
 export type LockFileConfigV1 = {
-  version: 'v1'
+  version: "v1";
   packages: {
-    [packageName: string]: LockFilePackageEntry
-  }
-}
-type LockFileVersions = 'v1' | 'v0'
+    [packageName: string]: LockFilePackageEntry;
+  };
+};
+type LockFileVersions = "v1" | "v0";
 
-type LockFileConfig = LockFileConfigV1
+type LockFileConfig = LockFileConfigV1;
 
 const determineLockFileVersion = (lockfile: any) => {
-  if (lockfile.version == 'v1' && lockfile.packages) {
-    return 'v1'
+  if (lockfile.version == "v1" && lockfile.packages) {
+    return "v1";
   }
-  return 'v0'
-}
+  return "v0";
+};
 
 type ConfigTransformers = {
-  [key in LockFileVersions]: (lockfile: any) => LockFileConfig
-}
+  [key in LockFileVersions]: (lockfile: any) => LockFileConfig;
+};
 
 const configTransformers: ConfigTransformers = {
   v0: (lockFile: LockFileConfigV0) => {
     return {
-      version: 'v1',
+      version: "v1",
       packages: lockFile,
-    }
+    };
   },
   v1: (lockFile: LockFileConfigV1) => lockFile,
-}
+};
 
 const getLockFileCurrentConfig = (lockFileConfig: any) => {
-  const version = determineLockFileVersion(lockFileConfig)
-  return configTransformers[version](lockFileConfig)
-}
+  const version = determineLockFileVersion(lockFileConfig);
+  return configTransformers[version](lockFileConfig);
+};
 
 export const removeLockfile = (options: { workingDir: string }) => {
-  const lockfilePath = join(options.workingDir, values.lockfileName)
-  removeSync(lockfilePath)
-}
+  const lockfilePath = join(options.workingDir, values.lockfileName);
+  removeSync(lockfilePath);
+};
 
 export const readLockfile = (options: { workingDir: string }) => {
-  const lockfilePath = join(options.workingDir, values.lockfileName)
+  const lockfilePath = join(options.workingDir, values.lockfileName);
   let lockfile: LockFileConfig = {
-    version: 'v1',
+    version: "v1",
     packages: {},
-  }
+  };
   try {
-    lockfile = getLockFileCurrentConfig(readJSONSync(lockfilePath))
+    lockfile = getLockFileCurrentConfig(readJSONSync(lockfilePath));
   } catch (e) {
-    return lockfile
+    return lockfile;
   }
-  return lockfile as LockFileConfig
-}
+  return lockfile as LockFileConfig;
+};
 
 export const writeLockfile = (
   lockfile: LockFileConfig,
   options: { workingDir: string },
 ) => {
-  const lockfilePath = join(options.workingDir, values.lockfileName)
-  const data = JSON.stringify(lockfile, null, 2)
-  writeFileSync(lockfilePath, data)
-}
+  const lockfilePath = join(options.workingDir, values.lockfileName);
+  const data = JSON.stringify(lockfile, null, 2);
+  writeFileSync(lockfilePath, data);
+};
 
 export const addPackageToLockfile = (
   packages: ({ name: string } & LockFilePackageEntry)[],
   options: { workingDir: string },
 ) => {
-  const lockfile = readLockfile(options)
+  const lockfile = readLockfile(options);
   packages.forEach(
     ({ name, version, file, link, replaced, signature, pure, workspace }) => {
-      const old = lockfile.packages[name] || {}
-      lockfile.packages[name] = {}
+      const old = lockfile.packages[name] || {};
+      lockfile.packages[name] = {};
       if (version) {
-        lockfile.packages[name].version = version
+        lockfile.packages[name].version = version;
       }
       if (signature) {
-        lockfile.packages[name].signature = signature
+        lockfile.packages[name].signature = signature;
       }
       if (file) {
-        lockfile.packages[name].file = true
+        lockfile.packages[name].file = true;
       }
       if (link) {
-        lockfile.packages[name].link = true
+        lockfile.packages[name].link = true;
       }
       if (pure) {
-        lockfile.packages[name].pure = true
+        lockfile.packages[name].pure = true;
       }
       if (workspace) {
-        lockfile.packages[name].workspace = true
+        lockfile.packages[name].workspace = true;
       }
       if (replaced || old.replaced) {
-        lockfile.packages[name].replaced = replaced || old.replaced
+        lockfile.packages[name].replaced = replaced || old.replaced;
       }
     },
-  )
-  writeLockfile(lockfile, options)
-}
+  );
+  writeLockfile(lockfile, options);
+};
