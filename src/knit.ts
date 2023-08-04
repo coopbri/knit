@@ -64,7 +64,7 @@ const getPublishOptions = (
 
 void yargs
   .usage(`🧶 ${cliCommand}` + ' [command] [options] [package1 [package2...]]')
-  .coerce('store-folder', function (folder: string) {
+  .coerce('store-folder', (folder: string) => {
     if (!knitGlobal.knitStoreMainDir) {
       knitGlobal.knitStoreMainDir = resolve(folder)
       console.log('Package store folder used:', knitGlobal.knitStoreMainDir)

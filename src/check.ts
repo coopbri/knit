@@ -20,7 +20,7 @@ const stagedChangesCmd = 'git diff --cached --name-only'
 const isPackageManifest = (fileName: string) =>
   path.basename(fileName) === 'package.json'
 
-export function checkManifest(options: CheckOptions) {
+export const checkManifest = (options: CheckOptions) => {
   const findLocalDepsInManifest = (manifestPath: string) => {
     const pkg = readJSONSync(manifestPath) as PackageManifest
     const addresMatch = new RegExp(

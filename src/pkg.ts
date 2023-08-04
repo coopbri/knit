@@ -55,7 +55,7 @@ const getIndent = (jsonStr: string) => {
   return detectIndent(jsonStr).indent
 }
 
-export function readPackageManifest(workingDir: string) {
+export const readPackageManifest = (workingDir: string) => {
   let pkg: PackageManifest
   const packagePath = join(workingDir, 'package.json')
   try {
@@ -87,7 +87,10 @@ const sortDependencies = (dependencies: { [name: string]: string }) => {
     )
 }
 
-export function writePackageManifest(workingDir: string, pkg: PackageManifest) {
+export const writePackageManifest = (
+  workingDir: string,
+  pkg: PackageManifest,
+) => {
   pkg = Object.assign({}, pkg)
   if (pkg.dependencies) {
     pkg.dependencies = sortDependencies(pkg.dependencies)

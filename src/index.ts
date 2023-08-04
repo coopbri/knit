@@ -42,7 +42,7 @@ export interface KnitGlobal {
 */
 export const knitGlobal: KnitGlobal = global as any
 
-export function getStoreMainDir(): string {
+export const getStoreMainDir = (): string => {
   if (knitGlobal.knitStoreMainDir) {
     return knitGlobal.knitStoreMainDir
   }
@@ -52,7 +52,7 @@ export function getStoreMainDir(): string {
   return join(userHome, '.' + values.myNameIs)
 }
 
-export function getStorePackagesDir(): string {
+export const getStorePackagesDir = (): string => {
   return join(getStoreMainDir(), 'packages')
 }
 
