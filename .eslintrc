@@ -17,20 +17,23 @@
   },
   "env": {
     "browser": true,
-    "es2021": true
+    "es2021": true,
+    "jest": true
   },
   "extends": [
     "plugin:@typescript-eslint/recommended",
     "plugin:import/recommended",
     "plugin:import/typescript",
+    "plugin:jest/recommended",
     "prettier"
   ],
   "plugins": [
     "@typescript-eslint",
     "import",
+    "jest",
+    "prefer-arrow",
     "typescript-sort-keys",
-    "unused-imports",
-    "prefer-arrow"
+    "unused-imports"
   ],
   "rules": {
     // allow non-null assertion operators
