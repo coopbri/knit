@@ -101,15 +101,13 @@ const extractSignature = (lockfile: LockFileConfigV1, packageName: string) => {
   return signature
 }
 
-describe('Knit package manager', function () {
-  this.timeout(60000)
-  before(() => {
+describe('Knit package manager', () => {
+  beforeAll(() => {
     fs.removeSync(tmpDir)
     fs.copySync(fixtureDir, tmpDir)
   })
-  describe('Package publish', function () {
-    this.timeout(5000)
-    before(() => {
+  describe('Package publish', () => {
+    beforeAll(() => {
       console.time('Package publish')
       return publishPackage({
         workingDir: depPackageDir,
@@ -171,7 +169,7 @@ describe('Knit package manager', function () {
 
     describe('signature consistency', () => {
       let expectedSignature: string
-      before(() => {
+      beforeAll(() => {
         expectedSignature = readFileSync(
           join(publishedPackagePath, 'knit.sig'),
         ).toString()
@@ -253,7 +251,7 @@ describe('Knit package manager', function () {
     const publishedFilePath = join(publishedPackage2Path, 'file.txt')
 
     join(depPackage2Dir, 'file.txt')
-    before(() => {
+    beforeAll(() => {
       console.time('Package2 publish')
       return publishPackage({
         workingDir: depPackage2Dir,
@@ -269,7 +267,7 @@ describe('Knit package manager', function () {
   })
 
   describe('Add package', () => {
-    before(() => {
+    beforeAll(() => {
       return addPackages([values.depPackage], {
         workingDir: projectDir,
       })
@@ -318,7 +316,7 @@ describe('Knit package manager', function () {
       values.depPackage,
       'node_modules/file.txt',
     )
-    before(() => {
+    beforeAll(() => {
       fs.ensureFileSync(innerNodeModulesFile)
       return updatePackages([values.depPackage], {
         workingDir: projectDir,
@@ -342,7 +340,7 @@ describe('Knit package manager', function () {
   })
 
   describe('Remove not existing package', () => {
-    before(() => {
+    beforeAll(() => {
       return removePackages(['xxxx'], {
         workingDir: projectDir,
       })
@@ -360,7 +358,7 @@ describe('Knit package manager', function () {
   })
 
   describe('Retreat package', () => {
-    before(() => {
+    beforeAll(() => {
       return removePackages([values.depPackage], {
         workingDir: projectDir,
         retreat: true,
@@ -402,7 +400,7 @@ describe('Knit package manager', function () {
   })
 
   describe('Update (restore after retreat) package', () => {
-    before(() => {
+    beforeAll(() => {
       return updatePackages([values.depPackage], {
         workingDir: projectDir,
       })
@@ -417,7 +415,7 @@ describe('Knit package manager', function () {
   })
 
   describe('Remove package', () => {
-    before(() => {
+    beforeAll(() => {
       return removePackages([values.depPackage], {
         workingDir: projectDir,
       })
@@ -449,7 +447,7 @@ describe('Knit package manager', function () {
   })
 
   describe('Add package (--link)', () => {
-    before(() => {
+    beforeAll(() => {
       return addPackages([values.depPackage], {
         workingDir: projectDir,
         linkDep: true,
@@ -489,7 +487,7 @@ describe('Knit package manager', function () {
   })
 
   describe('Updated linked (--link) package', () => {
-    before(() => {
+    beforeAll(() => {
       return updatePackages([values.depPackage], {
         workingDir: projectDir,
       })

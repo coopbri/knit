@@ -29,7 +29,7 @@ export const getFileHash = (srcPath: string, relPath: string = '') => {
     stream.on('error', reject).on('close', () => {
       resolve(md5sum.digest('hex'))
     })
-  })
+  });
 }
 
 const copyFile = async (

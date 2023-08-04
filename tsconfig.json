@@ -11,6 +11,7 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "moduleResolution": "node",
+    "outDir": "build",
     "baseUrl": "src",
     "strict": true,
     "noImplicitThis": true,
@@ -25,6 +26,7 @@
   },
   "include": [
     "src",
+    "*.config.ts",
     "test"
   ],
   "exclude": [
