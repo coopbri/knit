@@ -29,7 +29,6 @@ const coverageOptions: Pick<
 const jestConfig: JestConfig = {
   // throw error on deprecated API usage
   errorOnDeprecated: true,
-  // testEnvironment: 'jsdom',
   modulePaths: ["<rootDir>/src"],
   transform: {
     // run tests with`@swc/jest`: https://swc.rs/docs/usage/jest

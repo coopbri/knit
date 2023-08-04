@@ -1,14 +1,17 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "lib": ["DOM", "DOM.Iterable"],
+    "lib": [
+      "DOM",
+      "DOM.Iterable"
+    ],
     "module": "CommonJS",
     "declaration": true,
     "sourceMap": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "moduleResolution": "node",
-    "outDir": "build",
+    "noEmit": true,
     "baseUrl": "src",
     "strict": true,
     "noImplicitThis": true,
@@ -21,6 +24,12 @@
     "indentSize": 2,
     "tabSize": 2
   },
-  "include": ["src", "*.config.ts", "test"],
-  "exclude": ["node_modules"]
+  "include": [
+    "src",
+    "*.config.ts",
+    "test"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
