@@ -4,10 +4,10 @@ import { join } from "path";
 
 import { readJSONSync } from "fs-extra";
 
-import { execLoudOptions, values } from ".";
-import pkg from "../package.json";
+import pkg from "../../package.json";
+import { values, execLoudOptions } from "index";
 
-import type { PackageManifest } from ".";
+import type { PackageManifest } from "pkg";
 
 export type CheckOptions = {
   workingDir: string;

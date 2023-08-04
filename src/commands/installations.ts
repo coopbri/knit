@@ -2,8 +2,8 @@ import path from "path";
 
 import { accessSync, readJsonSync, writeFile } from "fs-extra";
 
-import { getStoreMainDir, values } from ".";
-import { readLockfile } from "./lockfile";
+import { getStoreMainDir, values } from "index";
+import { readLockfile } from "lockfile";
 
 export type PackageName = string & { __packageName: true };
 

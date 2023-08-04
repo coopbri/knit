@@ -1,3 +1,4 @@
+/* eslint-disable jest/expect-expect */
 import { doesNotThrow, throws, deepEqual, ok, strictEqual } from "assert";
 import { join } from "path";
 
@@ -12,10 +13,10 @@ import {
   knitGlobal,
   readPackageManifest,
 } from "../src";
-import { readInstallationsFile } from "../src/installations";
-import { readLockfile } from "../src/lockfile";
+import { readInstallationsFile } from "commands";
+import { readLockfile } from "lockfile";
 
-import type { LockFileConfigV1 } from "../src/lockfile";
+import type { LockFileConfigV1 } from "lockfile";
 
 const values = {
   depPackage: "dep-package",

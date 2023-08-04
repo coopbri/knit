@@ -1,20 +1,19 @@
 import { execSync } from "child_process";
 import { join } from "path";
 
-import {
-  execLoudOptions,
-  getPackageManager,
-  getStorePackagesDir,
-  readPackageManifest,
-  updatePackages,
-} from ".";
 import { copyPackageToStore } from "./copy";
-import { readInstallationsFile, removeInstallations } from "./installations";
-import { pmRunScriptCmd } from "./pm";
+import {
+  readInstallationsFile,
+  removeInstallations,
+  type PackageInstallation,
+} from "./installations";
+import { updatePackages } from "./update";
+import { execLoudOptions, getStorePackagesDir } from "index";
 import app from "lib/config/app";
+import { readPackageManifest } from "pkg";
+import { getPackageManager, pmRunScriptCmd } from "pm";
 
-import type { PackageScripts } from ".";
-import type { PackageInstallation } from "./installations";
+import type { PackageScripts } from "pkg";
 
 export interface PublishPackageOptions {
   workingDir: string;

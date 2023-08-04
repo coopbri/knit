@@ -3,23 +3,22 @@ import { join, resolve } from "path";
 
 import yargs from "yargs";
 
+import { makeConsoleColored, disabledConsoleOutput } from "./console";
+import { readRcConfig } from "./rc";
+import pkg from "../package.json";
 import {
-  values,
   publishPackage,
+  showInstallations,
+  cleanInstallations,
   addPackages,
   updatePackages,
   removePackages,
-  getStoreMainDir,
-  knitGlobal,
-} from ".";
-import { checkManifest } from "./check";
-import { makeConsoleColored, disabledConsoleOutput } from "./console";
-import { showInstallations, cleanInstallations } from "./installations";
-import { readRcConfig } from "./rc";
-import pkg from "../package.json";
+  checkManifest,
+} from "commands";
+import { values, knitGlobal, getStoreMainDir } from "index";
 import app from "lib/config/app";
 
-import type { PublishPackageOptions } from "./publish";
+import type { PublishPackageOptions } from "commands";
 
 const updateFlags = ["update", "upgrade", "up"];
 

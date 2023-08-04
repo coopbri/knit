@@ -3,7 +3,7 @@ import { join } from "path";
 import detectIndent from "detect-indent";
 import { readFileSync, writeFileSync } from "fs-extra";
 
-import type { PackageName } from "./installations";
+import type { PackageName } from "commands";
 
 export type PackageScripts = Partial<{
   preinstall: string;

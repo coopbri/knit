@@ -25,11 +25,11 @@ export interface UpdatePackagesOptions {
   workingDir: string;
 }
 
-export { publishPackage } from "./publish";
-export { updatePackages } from "./update";
-export { checkManifest } from "./check";
-export { removePackages } from "./remove";
-export { addPackages } from "./add";
+export { publishPackage } from "commands/publish";
+export { updatePackages } from "commands/update";
+export { checkManifest } from "commands/check";
+export { removePackages } from "commands/remove";
+export { addPackages } from "commands/add";
 export * from "./pkg";
 export * from "./pm";
 

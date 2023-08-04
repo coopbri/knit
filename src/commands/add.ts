@@ -12,6 +12,7 @@ import {
   ensureSymlinkSync,
 } from "fs-extra";
 
+import { addInstallations } from "./installations";
 import {
   execLoudOptions,
   getPackageStoreDir,
@@ -21,14 +22,13 @@ import {
   runPmUpdate,
   values,
   writePackageManifest,
-} from ".";
-import { addInstallations } from "./installations";
-import { addPackageToLockfile } from "./lockfile";
-import { getPackageManager, pmRunScriptCmd } from "./pm";
-import { copyDirSafe } from "./sync-dir";
+} from "..";
+import { addPackageToLockfile } from "../lockfile";
+import { getPackageManager, pmRunScriptCmd } from "../pm";
+import { copyDirSafe } from "../sync-dir";
 import app from "lib/config/app";
 
-import type { PackageScripts } from "./pkg";
+import type { PackageScripts } from "../pkg";
 
 export interface AddPackagesOptions {
   dev?: boolean;

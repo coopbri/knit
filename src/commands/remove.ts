@@ -2,14 +2,14 @@ import { join } from "path";
 
 import { existsSync, readdirSync, removeSync } from "fs-extra";
 
-import {
-  values,
-  parsePackageName,
-  readPackageManifest,
-  writePackageManifest,
-} from ".";
 import { removeInstallations } from "./installations";
-import { readLockfile, writeLockfile, removeLockfile } from "./lockfile";
+import { values } from "index";
+import { readLockfile, writeLockfile, removeLockfile } from "lockfile";
+import {
+  readPackageManifest,
+  parsePackageName,
+  writePackageManifest,
+} from "pkg";
 
 import type { PackageInstallation, PackageName } from "./installations";
 

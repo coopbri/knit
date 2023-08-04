@@ -1,6 +1,6 @@
-import { addPackages, parsePackageName } from ".";
 import { removeInstallations } from "./installations";
-import { readLockfile } from "./lockfile";
+import { addPackages, parsePackageName } from "..";
+import { readLockfile } from "../lockfile";
 
 import type { AddPackagesOptions } from "./add";
 import type { PackageInstallation } from "./installations";

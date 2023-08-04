@@ -3,7 +3,7 @@ import { resolve } from "path";
 import { copy, remove, stat } from "fs-extra";
 import { glob } from "glob";
 
-import { getFileHash } from "./copy";
+import { getFileHash } from "commands";
 
 import type { Stats } from "fs-extra";
 

@@ -8,15 +8,14 @@ import ignore from "ignore";
 import npmPacklist from "npm-packlist";
 
 import {
-  readIgnoreFile,
-  readPackageManifest,
-  readSignatureFile,
   getStorePackagesDir,
-  writePackageManifest,
+  readIgnoreFile,
+  readSignatureFile,
   writeSignatureFile,
-} from ".";
+} from "index";
+import { readPackageManifest, writePackageManifest } from "pkg";
 
-import type { PackageManifest } from ".";
+import type { PackageManifest } from "pkg";
 
 const shortSignatureLength = 8;
 
