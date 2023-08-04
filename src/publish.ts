@@ -11,6 +11,7 @@ import {
 import { copyPackageToStore } from "./copy";
 import { readInstallationsFile, removeInstallations } from "./installations";
 import { pmRunScriptCmd } from "./pm";
+import app from "lib/config/app";
 
 import type { PackageScripts } from ".";
 import type { PackageInstallation } from "./installations";
@@ -41,7 +42,9 @@ export const publishPackage = async (options: PublishPackageOptions) => {
     if (!options.scripts) return;
     const scriptCmd = pkg.scripts?.[script];
     if (scriptCmd) {
-      console.log(`Running ${script} script: ${scriptCmd}`);
+      console.log(
+        `${app.commandPrefix} Running ${script} script: ${scriptCmd}...`,
+      );
       execSync(`${pmRunScriptCmd[pm]} ${script}`, {
         cwd: workingDir,
         ...execLoudOptions,

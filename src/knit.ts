@@ -17,6 +17,7 @@ import { makeConsoleColored, disabledConsoleOutput } from "./console";
 import { showInstallations, cleanInstallations } from "./installations";
 import { readRcConfig } from "./rc";
 import pkg from "../package.json";
+import app from "lib/config/app";
 
 import type { PublishPackageOptions } from "./publish";
 
@@ -63,7 +64,11 @@ const getPublishOptions = (
 };
 
 void yargs
-  .usage(`🧶 ${cliCommand}` + " [command] [options] [package1 [package2...]]")
+  .scriptName(cliCommand)
+  .usage(
+    `${app.commandPrefix} ${cliCommand}` +
+      " [command] [options] [package1 [package2...]]",
+  )
   .coerce("store-folder", (folder: string) => {
     if (!knitGlobal.knitStoreMainDir) {
       knitGlobal.knitStoreMainDir = resolve(folder);

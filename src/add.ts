@@ -26,6 +26,7 @@ import { addInstallations } from "./installations";
 import { addPackageToLockfile } from "./lockfile";
 import { getPackageManager, pmRunScriptCmd } from "./pm";
 import { copyDirSafe } from "./sync-dir";
+import app from "lib/config/app";
 
 import type { PackageScripts } from "./pkg";
 
@@ -83,7 +84,9 @@ export const addPackages = async (
   const runPmScript = (script: string) => {
     const scriptCmd = localPkg.scripts?.[script as keyof PackageScripts];
     if (scriptCmd) {
-      console.log(`Running ${script} script: ${scriptCmd}`);
+      console.log(
+        `${app.commandPrefix} Running ${script} script: ${scriptCmd}...`,
+      );
       execSync(`${pmRunScriptCmd[pm]} ${script}`, {
         cwd: workingDir,
         ...execLoudOptions,

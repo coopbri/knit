@@ -4,6 +4,7 @@ import { join } from "path";
 import { existsSync } from "fs-extra";
 
 import { execLoudOptions } from ".";
+import app from "lib/config/app";
 
 type PackageManager = "yarn" | "npm" | "pnpm";
 
@@ -65,6 +66,6 @@ export const runPmUpdate = (workingDir: string, packages: string[]) => {
     " ",
   );
 
-  console.log(`Running ${pkgMgrCmd} in ${workingDir}`);
+  console.log(`${app.commandPrefix} Running ${pkgMgrCmd} in ${workingDir}...`);
   execSync(pkgMgrCmd, { cwd: workingDir, ...execLoudOptions });
 };
