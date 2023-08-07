@@ -2,6 +2,7 @@ node_modules
 !test/fixture/dep-package/node_modules
 tmp
 build
+coverage
 *.js
 *.d.ts
 *.js.map

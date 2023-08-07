@@ -1,2 +1,3 @@
 build
 *.d.ts
+coverage
