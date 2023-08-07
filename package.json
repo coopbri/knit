@@ -1,5 +1,5 @@
 {
-  "name": "knit",
+  "name": "@omnidev/knit",
   "version": "0.0.0",
   "description": "🧶 Knit local dependencies together",
   "license": "MIT",

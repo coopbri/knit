@@ -5,6 +5,7 @@ import pkg from "../../../package.json";
  */
 const app = {
   ...pkg,
+  name: "knit",
   commandPrefix: "🧶",
 };
 
