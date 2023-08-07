@@ -1,0 +1,94 @@
+{
+  "root": true,
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json",
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "ecmaVersion": "latest",
+    "sourceType": "module"
+  },
+  "settings": {
+    // ! NB: empty object is intentional, mitigates module alias issue
+    "import/resolver": {
+      "typescript": {}
+    }
+  },
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "jest": true
+  },
+  "extends": [
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/recommended",
+    "plugin:import/typescript",
+    "plugin:jest/recommended",
+    "prettier"
+  ],
+  "plugins": [
+    "@typescript-eslint",
+    "import",
+    "jest",
+    "prefer-arrow",
+    "typescript-sort-keys",
+    "unused-imports"
+  ],
+  "rules": {
+    // allow non-null assertion operators
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/ban-ts-comment": [
+      "error",
+      {
+        // allow `@ts-ignore` if a description is specified
+        "ts-ignore": "allow-with-description"
+      }
+    ],
+    // disallow unused variables
+    "no-unused-vars": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      {
+        "varsIgnorePattern": "^_",
+        "argsIgnorePattern": "^_"
+      }
+    ],
+    // warn on use of type `any`
+    "@typescript-eslint/no-explicit-any": "warn",
+    // explicitly handle promises (e.g. `await`, `void`)
+    "@typescript-eslint/no-floating-promises": "error",
+    // enforce type imports
+    "@typescript-eslint/consistent-type-imports": "error",
+    // prevent duplicate imports
+    "import/no-duplicates": "error",
+    // remove unused imports
+    "unused-imports/no-unused-imports": "warn",
+    // enforce import group order
+    "import/order": [
+      "error",
+      {
+        "alphabetize": {
+          "caseInsensitive": true,
+          "order": "asc"
+        },
+        // separate import groups (e.g. external dependencies from internal dependencies)
+        "groups": [
+          "builtin",
+          "external",
+          [
+            "internal",
+            // NB: TS aliased paths fall into `unknown` category. See https://github.com/import-js/eslint-plugin-import/issues/1379
+            "unknown",
+            "parent",
+            "sibling",
+            "index",
+            "object"
+          ],
+          "type"
+        ],
+        "newlines-between": "always"
+      }
+    ]
+  }
+}

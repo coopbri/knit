@@ -4,153 +4,191 @@
 
 > Streamline your local Node.js package dependency workflow.
 
-Knit is a fork of [yalc](https://github.com/wclr/yalc) which was created by `@wclr`, and the name is inspired by this GitHub [thread](https://github.com/yarnpkg/yarn/issues/1213).
+Knit is a fork of [yalc](https://github.com/wclr/yalc), which was created by [@wclr](https://github.com/wclr). The name is inspired by this GitHub [thread](https://github.com/yarnpkg/yarn/issues/1213).
 
-## Why
+## Overview
 
-When developing and authoring multiple packages (private or public), you often find yourself in need of using the latest/WIP versions in other projects that you are working on in your local environment **without publishing those packages to the remote registry.** NPM and Yarn address this issue with a similar approach of [symlinked packages](https://docs.npmjs.com/cli/link) (`npm/yarn link`). Though this may work in many cases, it often brings nasty [constraints and problems](https://github.com/yarnpkg/yarn/issues/1761#issuecomment-259706202) with dependency resolution, symlink interoperability between file systems, etc.
+`knit` is a CLI with a local repository designed to mirror a remote package repository, such as [npm](https://www.npmjs.com/). It allows you to publish packages from a local project folder to a local store, and install them in other local projects. It also allows you to easily propagate package updates.
 
-## What
+`knit` can be used with projects where package managers, such as `npm`, `yarn`, or `pnpm`, are used
+for managing `package.json` dependencies. `knit` creates a `knit.lock` file in your project (similar to `yarn.lock` and `package-lock.json`) that is used to ensure consistency while performing `knit` routines.
 
-- `knit` acts as very simple local repository for your locally developed packages that you want to share across your local environment.
-- When you run `knit publish` in the package directory, it grabs only files that should be published to NPM and _puts_ them in a special global store (located, for example, in `~/.knit`).
-- When you run `knit add my-package` in your `project` it _pulls_ package content into `.knit` in the current folder and injects a `file:`/`link:` dependency into `package.json`. Alternatively, you may use `knit link my-package` which will create a symlink to the package content in `node_modules` and will not touch `package.json` (like `npm/yarn link` does), or you even may use it with **Pnmp/Yarn/Npm workspaces**.
-- `knit` creates a special `knit.lock` file in your project (similar to `yarn.lock` and `package-lock.json`) that is used to ensure consistency while performing `knit`'s routines.
-- `knit` can be used with projects where `yarn` or `npm` package managers are used
-  for managing `package.json` dependencies.
+## Quick Start
 
-## Installation
+Install locally in a project (replace `yarn` with your preferred package manager):
 
-Using NPM:
-
-```
-npm i knit -g
+```sh
+yarn add -D @omnidev/knit
 ```
 
-Using Yarn:
+Or execute it directly and ephemerally with `yarn dlx`:
 
-```
-yarn global add knit
+```sh
+yarn dlx @omnidev/knit [...]
 ```
 
-Some documented features might not have been published yet, see the [change log](./CHANGELOG.md).
+## Key Commands
+
+- `knit publish`: publish a package to a local store (`~/.knit` by default)
+  - Only publishes files that would be published to a remote repository
+- `knit add $PACKAGE_NAME`: add a package from the store to a project
+  - Pulls package content into `$PROJECT_DIR/.knit/` and injects a relative local (`file:`/`link:` depending on usage) dependency into `package.json`
+  - Alternatively, use `knit link $PACKAGE_NAME` which creates a symlink in `node_modules` to the package content, and will not modify `package.json` (like `npm/yarn link` does), or you even may use it with `npm`/`yarn`/`pnpm` workspaces
+- `knit help` for help
 
 ## Usage
 
-### Publish
+### Publish (`knit publish`)
 
-- Run `knit publish` in your dependency package `my-package`.
-- It will copy [all the files that should be published in remote NPM registry](https://docs.npmjs.com/files/package.json#files).
-- If your package has any of these lifecycle scripts: `prepublish`, `prepare`, `prepublishOnly`, `prepack`, `preknitpublish`, they will run before in this order. If your package has any of these: `postknitpublish`, `postpack`, `publish`, `postpublish`, they will run after in this order. Use `--no-scripts` to publish without running scripts.
-- When publishing, `knit` can optionally calculate a hash signature from the file contents and use the signature in the resulting package `version` (like `"1.2.3+ffffffff"`). To enable this, pass the `--sig` option to the `knit publish` command.
-- You may also use `.knitignore` to exclude files from publishing to knit repo, for example, files like README.md, etc.
-- `--content` flag will show included files in the published package
-- **NB!** In terms of which files will be included in the package `knit` fully supposed to emulate behavior of `npm` client (`npm pack`). [If you have nested `.knit` folder in your package](https://github.com/coopbri/knit/issues/95) that you are going to publish with `knit` and you use `package.json` `files` list, it should be included there explicitly.
-- **NB!** Windows users should make sure the `LF` new line symbol is used in published sources; it may be needed for some packages to work correctly (for example, `bin` scripts). `knit` won't convert line endings for you (because `npm` and `yarn` won't either).
-- **NB!** Note that, if you want to include `.knit` folder in published package content, you should add `!.knit` line to `.npmignore`.
-- [Easily propagate package updates everywhere.](#pushing-updates-automatically-to-all-installations)
-- Knit by default resolves `workspace:` protocol in dependencies, to omit this use `-no-workspace-resolve` flag
+Run in a project to publish it to the store.
 
-### Add
+- Copies [all the files that should be published to a remote registry](https://docs.npmjs.com/files/package.json#files)
+- If your package has any of these lifecycle scripts, then will run before publishing, in the following order:
 
-- Run `knit add my-package` in your dependent project, which
-  will copy the current version from the store to your project's `.knit` folder and inject a `file:.knit/my-package` dependency into `package.json`.
-- You may specify a particular version with `knit add my-package@version`. This version will be fixed in `knit.lock` and will not affect newly published versions during updates.
-- Use the `--link` option to add a `link:` dependency instead of `file:`.
-- Use the `--dev` option to add knit package to dev dependencies.
-- With `--pure` flag it will not touch `package.json` file, nor it will touch modules folder, this is useful for example when working with [**Yarn workspaces**](https://yarnpkg.com/lang/en/docs/workspaces/) (read below in _Advanced usage_ section)
-- With `--workspace` (or `-W`) it will add dependency with "workspace:" protocol.
+  - `prepublish`
+  - `prepare`
+  - `prepublishOnly`
+  - `prepack`
+  - `preknitpublish`
 
-### Link
+- If your package has any of these lifecycle scripts, they will run after publishing, in the following order:
 
-- As an alternative to `add`, you can use the `link` command which is similar to `npm/yarn link`, except that the symlink source will be not the global link directory but the local `.knit` folder of your project.
-- After `knit` copies package content to `.knit` folder it will create a symlink:
-  `project/.knit/my-package ==> project/node_modules/my-package`. It will not touch `package.json` in this case.
+  - `postknitpublish`
+  - `postpack`
+  - `publish`
+  - `postpublish`
 
-### Update
+- Use `--no-scripts` to publish without running scripts
 
-- Run `knit update my-package` to update the latest version from store.
-- Run `knit update` to update all the packages found in `knit.lock`.
-- `preknit` and `postknit` scripts will be executed in target package on add/update operations which are performed while `push`
-- if need to perform pre/post `scripts` on update of particular package use `(pre|post)knit.package-name` name for script in your `package.json`.
-- update `--update` (`--upgrade`, `--up`) to run package managers's update command for packages.
+- When publishing, `knit` can optionally calculate a hash signature from the file contents and use the signature in the resulting package `version` (e.g. `"1.2.3+ffffffff"`). To enable this, pass `--sig` to the `knit publish` command
+- Use `.knitignore` to exclude files from publishing to knit repo, such as `README.md` -`--content` will show included files in the published package
+- Considering publishing, `knit` emulates the behavior of the `npm` client (`npm pack`). If you have a nested `.knit` folder in your package that you are going to publish with `knit` and you use the `package.json` `files` key, it should be included there explicitly. See [wclr/yalc#95](https://github.com/wclr/yalc/issues/95)
+- If you want to include the `.knit` folder in published package content, add the `!.knit` pattern to `.npmignore`
+- By default, Knit resolves the `workspace:` protocol in dependencies. This can be bypassed with `--no-workspace-resolve`
+- For convenience, you can [automatically propagate package updates to dependent projects](#pushing-updates-automatically-to-all-installations)
+- **Note for Windows users:** make sure the `LF` (line feed) symbol is used in published sources; it may be needed for some packages to work correctly (for example, `bin` scripts). `knit` won't convert line endings for you (because `npm` and `yarn` won't either)
 
-### Remove
+### Add (`knit add`)
 
-- Run `knit remove my-package`, it will remove package info from `package.json` and `knit.lock`
-- Run `knit remove --all` to remove all packages from project.
+Run in a project to pull a package from the store and install it as a dependency.
 
-### Installations
+- Copies the current version from the store to your project's `.knit` folder and injects a `file:.knit/$PACKAGE_NAME` dependency into `package.json`
+- Specify a particular version with `knit add $PACKAGE_NAME@version`. This version will be fixed in `knit.lock` and will not affect newly published versions during updates
+- Use `--link` to add a `link:` protocol dependency instead of the `file:` protocol
+- Use `--dev` to add the package as a development dependency (`devDependencies`)
+- Use `--pure` to avoid modifying `package.json` and `node_modules`
+  - This is useful when working with workspaces (see [workspaces](#use-with-npmyarnpnpm-workspaces) section)
+- Use `--workspace` (or `-W`) to add a dependency with `workspace:` protocol
 
-- Run `knit installations clean my-package` to unpublish a package published with `knit publish`
-- Run `knit installations show my-package` to show all packages to which `my-package` has been installed.
+### Link (`knit link`)
 
-## Advanced usage
+As an alternative to `add`, you can use the `link` command. This is similar to `npm link`/`yarn link`, except the symlink source will be the local `.knit` folder of your project instead of the global link directory.
 
-### Pushing updates automatically to all installations
+After `knit` copies package content to the `.knit` folder, it will create a symlink (and not modify `package.json`): `$PROJECT_DIR/.knit/$PACKAGE_NAME ⟹ $PROJECT_DIR/node_modules/$PACKAGE_NAME`.
 
-- When you run `knit add|link|update`, the project's package locations are tracked and saved, so `knit` knows where each package in the store is being used in your local environment.
-- `knit publish --push` will publish your package to the store and propagate all changes to existing `knit` package installations (this will actually do `update` operation on the location).
-- `knit push` - is a use shortcut command for push operation (which will likely become your primarily used command for publication):
-- `scripts` options is `false` by default, so it won't run `pre/post` scripts (may change this with passing `--scripts` flag).
-- With `--changed` flag knit will first check if package content has changed before publishing and pushing, it is a quick operation and may be useful for _file watching scenarios_ with pushing on changes.
-- Use `--replace` option to force replacement of package content.
-- Use `preknit` and `postknit` (read in `update` docs) to execute needed script on every push.
-- Use `--update` to run `yarn/npm/pnpm update` command for pushed packages.
+### Update (`knit update`)
 
-### Keep it out of git
+Run `knit update $PACKAGE_NAME` to update to the latest version of `$PACKAGE_NAME` from the store, or just `knit update` to update all the packages found in `knit.lock`.
 
-- If you are using `knit'ed` modules temporarily during development, first add `.knit` and `knit.lock` to `.gitignore`.
-- Use `knit link`, that won't touch `package.json`
-- If you use `knit add` it will change `package.json`, and ads `file:`/`link:` dependencies, if you may want to use `knit check` in the [precommit hook](https://github.com/typicode/husky) which will check package.json for `knit'ed` dependencies and exits with an error if you forgot to remove them.
+- `preknit` and `postknit` scripts will be executed in the target package as part of add and update operations (which are performed during `knit push`, see [push](#pushing-updates-automatically-to-all-installations) section)
+- If you need to perform pre- or post- lifecycle scripts upon the update operation of a particular package, use a `(pre|post)knit.package-name` script in your `package.json`
+- Use `--update` (or `--upgrade`/`--up`) to run your package managers's update command for packages
 
-### Keep it in git
+### Remove (`knit remove`)
 
-- You may want to keep shared `knit'ed` stuff within the projects you are working on and treat it as a part of the project's codebase. This may really simplify management and usage of shared _work in progress_ packages within your projects and help to make things consistent. So, then just do it, keep `.knit` folder and `knit.lock` in git.
-- Replace it with published versions from remote repository when ready.
-- **NB!** - standard non-code files like `README`, `LICENCE` etc. will be included also, so you may want to exclude them in `.gitignore` with a line like `**/.knit/**/*.md` or you may use `.knitignore` not to include those files in package content.
+- Run `knit remove $PACKAGE_NAME` to remove the package's dependency information from `package.json` and `knit.lock`
+- Run `knit remove --all` to remove all packages from a project
 
-### Publish/push sub-projects
+### Installations (`knit installations`)
 
-- Useful for monorepos (projects with multiple sub-projects/packages): `knit publish some-project` will perform publish operation in the `./some-project` directory relative to `process.cwd()`
+- Run `knit installations clean $PACKAGE_NAME` to unpublish a package previously published with `knit publish`
+- Run `knit installations show $PACKAGE_NAME` to show all packages where `$PACKAGE_NAME` has been installed
+
+## Advanced Usage
+
+### Pushing Updates Automatically to All Installations
+
+`knit publish --push` (or `knit push`) will publish your package to the store and propagate all changes to existing `knit` package installations (this performs the `update` operation on the target location).
+
+When you run `knit add|link|update`, the project's package locations are tracked and saved, so `knit` knows where each package in the store is being used in your local environment.
+
+The `scripts` option is `false` by default, so it won't run `pre/post` scripts (change this behavior by passing `--scripts`).
+
+Flags:
+
+- `--changed`: causes `knit` to first check if the package content has changed before publishing and pushing
+  - This is a quick operation, and may be useful for file-watching scenarios when pushing
+- `--replace`: causes `knit` to force replacement of the package content
+- `preknit` and `postknit` (detailed in [Update](#update-knit-update) section): execute lifecycle script(s) on every push
+- `--update`: run the `npm|yarn|pnpm update` command for pushed packages
+
+### Committing `knit` files
+
+It is up to you whether you would like to commit the files generated by `knit` (`.knit/` and `knit.lock`) to your repository.
+
+**Reasons _not_ to commit:**
+
+- You are using `knit` modules temporarily during development
+- You strictly use `knit link` (which does not modify `package.json`)
+- You are using `knit add` and don't want to worry about changing the `file:`/`link:` dependencies
+  - This can be circumvented by using `knit check` in a precommit hook, e.g. with [Husky](https://github.com/typicode/husky), which checks `package.json` for Knit dependencies and exits with an error if it finds any
+
+**Reasons _to_ commit:**
+
+- You want to maintain deterministic builds as they relate to Knit dependencies
+- You want to keep shared `knit` files within the projects you are working on and treat it as a part of the project's codebase
+  - This may simplify management and usage of shared packages within your projects and maintain consistency
+
+If you decide to commit, consider that standard non-code files like `README.md` and `LICENSE.md` will also be included, so you may want to exclude them in `.gitignore` with a pattern such as `**/.knit/**/*.md`. Alternatively, use `.knitignore` to avoid including those files in package content.
+
+### Publish/Push Subprojects
+
+Useful for [monorepos](https://en.wikipedia.org/wiki/Monorepo), `knit publish $PROJECT_NAME` will perform the publish operation in the `./$PROJECT_NAME` directory relative to `process.cwd()`.
 
 ### Retreat and Restore
 
-- Instead of completely removing package you may temporary set it back with `knit retreat [--all]` for example before package publication to remote registry.
-- After or later restore it with `knit restore`.
+Instead of completely removing a package, it can be temporary set back with `knit retreat [--all]` (e.g. before package publication to a remote registry).
 
-### Use with **Yarn/Pnpm workspaces**
+Later, it can be restored with `knit restore`.
 
-Use if you will try to `add` repo in `workspaces` enabled package, `--pure` option will be used by default, so `package.json` and modules folder will not be touched.
+### Use with `npm`/`yarn`/`pnpm` Workspaces
 
-Then you add knit'ed package folder to `workspaces` in `package.json` (you may just add `.knit/*` and `.knit/@*/*` patterns). While `update` (or `push`) operation, packages content will be updated automatically and `yarn` will care about everything else.
+`--pure` will be used by default if you try to `add` a project in a `workspaces`-enabled package, so `package.json` and `node_modules` will not be modified. Then, you can add the Knit-enabled package folder to `workspaces` in `package.json` (e.g. add `.knit/*` and `.knit/@*/*` patterns). During the `update` (or `push`) operation, package content will be updated automatically and your package manager will handle the rest.
 
-If you want to override default pure behavior use `--no-pure` flag.
+If you want to override the default pure behavior, use `--no-pure`.
 
-### Clean up installations file
+### Clean up Installations File
 
-- While working with knit for some time on the dev machine you may face the situation when you have locations where you added knit'ed packages being removed from file system, and this will cause some warning messages when knit will try to push package to removed location. To get rid of such messages, there is an explicit command for this: `knit installations clean [package]`.
+While working with `knit`, you might face a situation when you have locations where Knit-enabled projects have been removed from the filesystem, which will cause warnings when `knit` tries to push a package to the missing location. To get rid of these warnings, use `knit installations clean $PACKAGE_NAME`.
 
-### Override default package store folder
+### Override Default Package Store Folder
 
-- You may use `--store-folder` flag option to override default location for storing published packages.
+Use `--store-folder` to override the default location for storing published packages.
 
-### Control output
+### Control Output
 
-- Use `--quiet` to fully disable output (except of errors). Use `--no-colors` to disable colors.
+Use `--quiet` to fully disable output, except for errors. Use `--no-colors` to disable colors.
 
-### Set default options via .knitrc
+### Set Default Options via `.knitrc`
 
-- For example add `workspace-resolve=false` line to the `.knitrc` file to turn off `workspace:` protocol resolution or `sig=false` to disable package version hash signature.
+A `.knitrc` file can be created to declaratively set default options for Knit.
 
-## Related links
+Valid options:
 
-- [yarn probably shouldn't cache packages resolved with a file path](https://github.com/yarnpkg/yarn/issues/2165)
-- ["yarn knit": a better "yarn link"](https://github.com/yarnpkg/yarn/issues/1213)
-- [npm-link-shared](https://github.com/OrKoN/npm-link-shared)
-- [yarn link does not install package dependencies](https://github.com/yarnpkg/yarn/issues/2914)
-- [[npm] RFC: file: specifier changes](https://github.com/npm/npm/pull/15900)
+- `sig`: control hash signatures for package versions
+- `workspace-resolve`: control `workspace:` protocol resolution
+- `dev-mod`: control removal of `devDependencies` from package content
+- `scripts`: control lifecycle scripts
+- `quiet`: control console output
+- `files`: control display of included files in published packages
 
-## Licence
+Example:
 
-The code in this repository is licensed under MIT, &copy; Brian Cooper and the original yalc work MIT &copy; Alex Osh. See <a href="LICENSE.md">LICENSE.md</a> for more information.
+```txt
+workspace-resolve=false
+sig=false
+```
+
+## License
+
+The code in this repository is licensed under MIT, &copy; Brian Cooper. The original [yalc](https://github.com/wclr/yalc) work is licensed under MIT &copy; Alex Osh. See <a href="LICENSE.md">LICENSE.md</a> for more information.

@@ -1,60 +1,52 @@
 #!/usr/bin/env node
-import yargs from 'yargs'
-import { join, resolve } from 'path'
-import pkg from '../package.json'
+import { join, resolve } from "path";
 
+import yargs from "yargs";
+
+import { makeConsoleColored, disabledConsoleOutput } from "./console";
+import { readRcConfig } from "./rc";
 import {
-  values,
   publishPackage,
+  showInstallations,
+  cleanInstallations,
   addPackages,
   updatePackages,
   removePackages,
-  getStoreMainDir,
-  knitGlobal,
-} from '.'
+  checkManifest,
+} from "commands";
+import { values, knitGlobal, getStoreMainDir } from "index";
+import app from "lib/config/app";
 
-import { showInstallations, cleanInstallations } from './installations'
+import type { PublishPackageOptions } from "commands";
 
-import { checkManifest } from './check'
-import { makeConsoleColored, disabledConsoleOutput } from './console'
-import { PublishPackageOptions } from './publish'
-import { readRcConfig } from './rc'
-
-const updateFlags = ['update', 'upgrade', 'up']
+const updateFlags = ["update", "upgrade", "up"];
 
 const publishFlags = [
-  'scripts',
-  'sig',
-  'dev-mod',
-  'changed',
-  'files',
+  "scripts",
+  "sig",
+  "dev-mod",
+  "changed",
+  "files",
   ...updateFlags,
-]
+];
 
-const cliCommand = values.myNameIs
+const cliCommand = values.myNameIs;
 
-const getVersionMessage = () => {
-  // TODO use import above
-  // TODO replace all dynamic knit -> pkg.name
-  const pkg = require(__dirname + '/../package.json')
-  return pkg.version
-}
+makeConsoleColored();
 
-makeConsoleColored()
+const rcArgs = readRcConfig();
 
-const rcArgs = readRcConfig()
-
-if (process.argv.includes('--quiet') || rcArgs.quiet) {
-  disabledConsoleOutput()
+if (process.argv.includes("--quiet") || rcArgs.quiet) {
+  disabledConsoleOutput();
 }
 
 const getPublishOptions = (
   argv: any,
   override: Partial<PublishPackageOptions> = {},
 ): PublishPackageOptions => {
-  const folder = argv._[1]
+  const folder = argv._[1];
   return {
-    workingDir: join(process.cwd(), folder || ''),
+    workingDir: join(process.cwd(), folder || ""),
     push: argv.push,
     replace: argv.replace,
     signature: argv.sig,
@@ -66,106 +58,109 @@ const getPublishOptions = (
     workspaceResolve: argv.workspaceResolve,
     devMod: argv.devMod,
     ...override,
-  }
-}
+  };
+};
 
-/* tslint:disable-next-line */
-yargs
-  .usage(`🧶 ${cliCommand}` + ' [command] [options] [package1 [package2...]]')
-  .coerce('store-folder', function (folder: string) {
+void yargs
+  .scriptName(cliCommand)
+  .usage(
+    `${app.commandPrefix} ${cliCommand}` +
+      " [command] [options] [package1 [package2...]]",
+  )
+  .coerce("store-folder", (folder: string) => {
     if (!knitGlobal.knitStoreMainDir) {
-      knitGlobal.knitStoreMainDir = resolve(folder)
-      console.log('Package store folder used:', knitGlobal.knitStoreMainDir)
+      knitGlobal.knitStoreMainDir = resolve(folder);
+      console.log("Package store folder used:", knitGlobal.knitStoreMainDir);
     }
   })
   .command({
-    command: '*',
+    command: "*",
     builder: () => {
-      return yargs.boolean(['version'])
+      return yargs.boolean(["version"]);
     },
     handler: (argv) => {
-      let msg = `Use '${pkg.name} help' to see available commands.`
+      let msg = `Use '${app.name} help' to see available commands.`;
       if (argv._[0]) {
-        msg = 'Unknown command `' + argv._[0] + '`. ' + msg
+        msg = "Unknown command `" + argv._[0] + "`. " + msg;
       } else {
         if (argv.version) {
-          msg = getVersionMessage()
+          msg = app.version;
         }
       }
-      console.log(msg)
+      console.log(msg);
     },
   })
   .command({
-    command: 'publish',
-    describe: `Publish package in ${pkg.name} local repo`,
+    command: "publish",
+    describe: `Publish package in ${app.name} local repo`,
     builder: () => {
       return yargs
-        .default('sig', false)
-        .default('scripts', true)
-        .default('dev-mod', true)
-        .default('workspace-resolve', true)
+        .default("sig", false)
+        .default("scripts", true)
+        .default("dev-mod", true)
+        .default("workspace-resolve", true)
         .default(rcArgs)
-        .alias('script', 'scripts')
-        .boolean(['push'].concat(publishFlags))
+        .alias("script", "scripts")
+        .boolean(["push"].concat(publishFlags));
     },
     handler: (argv) => {
-      return publishPackage(getPublishOptions(argv))
+      return publishPackage(getPublishOptions(argv));
     },
   })
   .command({
-    command: 'push',
-    describe: `Publish package in ${pkg.name} local repo and push to all installations`,
+    command: "push",
+    describe: `Publish package in ${app.name} local repo and push to all installations`,
     builder: () => {
       return yargs
-        .default('sig', false)
-        .default('scripts', false)
-        .default('dev-mod', true)
-        .default('workspace-resolve', true)
+        .default("sig", false)
+        .default("scripts", false)
+        .default("dev-mod", true)
+        .default("workspace-resolve", true)
         .default(rcArgs)
-        .alias('script', 'scripts')
-        .boolean(['safe'].concat(publishFlags))
-        .option('replace', { describe: 'Force package content replacement' })
+        .alias("script", "scripts")
+        .boolean(["safe"].concat(publishFlags))
+        .option("replace", { describe: "Force package content replacement" });
     },
     handler: (argv) => {
-      return publishPackage(getPublishOptions(argv, { push: true }))
+      return publishPackage(getPublishOptions(argv, { push: true }));
     },
   })
   .command({
-    command: 'installations',
-    describe: 'Work with installations file: show/clean',
+    command: "installations",
+    describe: "Work with installations file: show/clean",
     builder: () => {
-      return yargs.boolean(['dry'])
+      return yargs.boolean(["dry"]);
     },
     handler: async (argv) => {
-      const action = argv._[1]
-      const packages = argv._.slice(2)
+      const action = argv._[1];
+      const packages = argv._.slice(2) as string[];
       switch (action) {
-        case 'show':
-          showInstallations({ packages })
-          break
-        case 'clean':
-          await cleanInstallations({ packages, dry: argv.dry })
-          break
+        case "show":
+          showInstallations({ packages });
+          break;
+        case "clean":
+          await cleanInstallations({ packages, dry: argv.dry });
+          break;
         default:
-          console.info('Need installation action: show | clean')
+          console.info("Need installation action: show | clean");
       }
     },
   })
   .command({
-    command: 'add',
-    describe: `Add package from ${pkg.name} repo to the project`,
+    command: "add",
+    describe: `Add package from ${app.name} repo to the project`,
     builder: () => {
       return yargs
-        .boolean(['file', 'dev', 'link', ...updateFlags])
-        .alias('D', 'dev')
-        .boolean('workspace')
-        .alias('save-dev', 'dev')
-        .alias('workspace', 'W')
+        .boolean(["file", "dev", "link", ...updateFlags])
+        .alias("D", "dev")
+        .boolean("workspace")
+        .alias("save-dev", "dev")
+        .alias("workspace", "W")
         .default(rcArgs)
-        .help(true)
+        .help(true);
     },
     handler: (argv) => {
-      return addPackages(argv._.slice(1), {
+      return addPackages(argv._.slice(1) as string[], {
         dev: argv.dev,
         linkDep: argv.link,
         restore: argv.restore,
@@ -173,109 +168,109 @@ yargs
         workspace: argv.workspace,
         update: argv.update || argv.upgrade,
         workingDir: process.cwd(),
-      })
+      });
     },
   })
   .command({
-    command: 'link',
-    describe: `Link package from ${pkg.name} repo to the project`,
+    command: "link",
+    describe: `Link package from ${app.name} repo to the project`,
     builder: () => {
-      return yargs.default(rcArgs).help(true)
+      return yargs.default(rcArgs).help(true);
     },
     handler: (argv) => {
-      return addPackages(argv._.slice(1), {
+      return addPackages(argv._.slice(1) as string[], {
         link: true,
         pure: argv.pure,
         workingDir: process.cwd(),
-      })
+      });
     },
   })
   .command({
-    command: 'update',
-    describe: `Update packages from ${pkg.name} repo`,
+    command: "update",
+    describe: `Update packages from ${app.name} repo`,
     builder: () => {
       return yargs
         .boolean([...updateFlags])
         .default(rcArgs)
-        .help(true)
+        .help(true);
     },
-    handler: (argv) => {
-      return updatePackages(argv._.slice(1), {
+    handler: async (argv) => {
+      await updatePackages(argv._.slice(1) as string[], {
         update: argv.update || argv.upgrade,
         restore: argv.restore,
         workingDir: process.cwd(),
-      })
+      });
     },
   })
   .command({
-    command: 'restore',
-    describe: 'Restore retreated packages',
+    command: "restore",
+    describe: "Restore retreated packages",
     builder: () => {
       return yargs
         .boolean([...updateFlags])
         .default(rcArgs)
-        .help(true)
+        .help(true);
     },
-    handler: (argv) => {
-      return updatePackages(argv._.slice(1), {
+    handler: async (argv) => {
+      await updatePackages(argv._.slice(1) as string[], {
         update: argv.update || argv.upgrade,
         restore: true,
         workingDir: process.cwd(),
-      })
+      });
     },
   })
   .command({
-    command: 'remove',
-    describe: 'Remove packages from the project',
+    command: "remove",
+    describe: "Remove packages from the project",
     builder: () => {
-      return yargs.boolean(['retreat', 'all']).default(rcArgs).help(true)
+      return yargs.boolean(["retreat", "all"]).default(rcArgs).help(true);
     },
     handler: (argv) => {
-      return removePackages(argv._.slice(1), {
+      return removePackages(argv._.slice(1) as string[], {
         retreat: argv.retreat,
         workingDir: process.cwd(),
         all: argv.all,
-      })
+      });
     },
   })
   .command({
-    command: 'retreat',
+    command: "retreat",
     describe:
-      'Remove packages from project, but leave in lock file (to be restored later)',
+      "Remove packages from project, but leave in lock file (to be restored later)",
     builder: () => {
-      return yargs.boolean(['all']).help(true)
+      return yargs.boolean(["all"]).help(true);
     },
     handler: (argv) => {
-      return removePackages(argv._.slice(1), {
+      return removePackages(argv._.slice(1) as string[], {
         all: argv.all,
         retreat: true,
         workingDir: process.cwd(),
-      })
+      });
     },
   })
   .command({
-    command: 'check',
-    describe: `Check package.json for ${pkg.name} packages`,
+    command: "check",
+    describe: `Check package.json for ${app.name} packages`,
     builder: () => {
-      return yargs.boolean(['commit']).usage('check usage here').help(true)
+      return yargs.boolean(["commit"]).usage("check usage here").help(true);
     },
     handler: (argv) => {
-      const gitParams = process.env.GIT_PARAMS
+      const gitParams = process.env.GIT_PARAMS;
       if (argv.commit) {
-        console.log('gitParams', gitParams)
+        console.log("gitParams", gitParams);
       }
       checkManifest({
         commit: argv.commit,
         all: argv.all,
         workingDir: process.cwd(),
-      })
+      });
     },
   })
   .command({
-    command: 'dir',
-    describe: `Show ${pkg.name} system directory`,
+    command: "dir",
+    describe: `Show ${app.name} system directory`,
     handler: () => {
-      console.log(getStoreMainDir())
+      console.log(getStoreMainDir());
     },
   })
-  .help('help').argv
+  .help("help").argv;
