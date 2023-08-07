@@ -25,5 +25,6 @@ jobs:
           title: "feature(release): version packages"
           commit: "ci(changesets): version packages"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # custom PAT used due to https://github.com/changesets/action/issues/187
+          GITHUB_TOKEN: ${{ secrets.CHANGESETS_GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
