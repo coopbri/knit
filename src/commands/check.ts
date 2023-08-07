@@ -4,8 +4,8 @@ import { join } from "path";
 
 import { readJSONSync } from "fs-extra";
 
-import pkg from "../../package.json";
 import { values, execLoudOptions } from "index";
+import app from "lib/config/app";
 
 import type { PackageManifest } from "pkg";
 
@@ -55,7 +55,7 @@ export const checkManifest = (options: CheckOptions) => {
   const manifestPath = join(options.workingDir, "package.json");
   const localDeps = findLocalDepsInManifest(manifestPath);
   if (localDeps.length) {
-    console.info(`${pkg.name} dependencies found: ${localDeps}`);
+    console.info(`${app.name} dependencies found: ${localDeps}`);
     process.exit(1);
   }
 };

@@ -5,7 +5,6 @@ import yargs from "yargs";
 
 import { makeConsoleColored, disabledConsoleOutput } from "./console";
 import { readRcConfig } from "./rc";
-import pkg from "../package.json";
 import {
   publishPackage,
   showInstallations,
@@ -80,12 +79,12 @@ void yargs
       return yargs.boolean(["version"]);
     },
     handler: (argv) => {
-      let msg = `Use '${pkg.name} help' to see available commands.`;
+      let msg = `Use '${app.name} help' to see available commands.`;
       if (argv._[0]) {
         msg = "Unknown command `" + argv._[0] + "`. " + msg;
       } else {
         if (argv.version) {
-          msg = pkg.version;
+          msg = app.version;
         }
       }
       console.log(msg);
@@ -93,7 +92,7 @@ void yargs
   })
   .command({
     command: "publish",
-    describe: `Publish package in ${pkg.name} local repo`,
+    describe: `Publish package in ${app.name} local repo`,
     builder: () => {
       return yargs
         .default("sig", false)
@@ -110,7 +109,7 @@ void yargs
   })
   .command({
     command: "push",
-    describe: `Publish package in ${pkg.name} local repo and push to all installations`,
+    describe: `Publish package in ${app.name} local repo and push to all installations`,
     builder: () => {
       return yargs
         .default("sig", false)
@@ -149,7 +148,7 @@ void yargs
   })
   .command({
     command: "add",
-    describe: `Add package from ${pkg.name} repo to the project`,
+    describe: `Add package from ${app.name} repo to the project`,
     builder: () => {
       return yargs
         .boolean(["file", "dev", "link", ...updateFlags])
@@ -174,7 +173,7 @@ void yargs
   })
   .command({
     command: "link",
-    describe: `Link package from ${pkg.name} repo to the project`,
+    describe: `Link package from ${app.name} repo to the project`,
     builder: () => {
       return yargs.default(rcArgs).help(true);
     },
@@ -188,7 +187,7 @@ void yargs
   })
   .command({
     command: "update",
-    describe: `Update packages from ${pkg.name} repo`,
+    describe: `Update packages from ${app.name} repo`,
     builder: () => {
       return yargs
         .boolean([...updateFlags])
@@ -251,7 +250,7 @@ void yargs
   })
   .command({
     command: "check",
-    describe: `Check package.json for ${pkg.name} packages`,
+    describe: `Check package.json for ${app.name} packages`,
     builder: () => {
       return yargs.boolean(["commit"]).usage("check usage here").help(true);
     },
@@ -269,7 +268,7 @@ void yargs
   })
   .command({
     command: "dir",
-    describe: `Show ${pkg.name} system directory`,
+    describe: `Show ${app.name} system directory`,
     handler: () => {
       console.log(getStoreMainDir());
     },

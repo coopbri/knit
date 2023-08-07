@@ -3,14 +3,14 @@ import { join } from "path";
 
 import { readFileSync, writeFileSync } from "fs-extra";
 
-import pkg from "../package.json";
+import app from "lib/config/app";
 
 import type { ExecSyncOptions } from "child_process";
 
 const userHome = homedir();
 
 export const values = {
-  myNameIs: pkg.name,
+  myNameIs: app.name,
   ignoreFileName: ".knitignore",
   myNameIsCapitalized: "Knit",
   lockfileName: "knit.lock",
