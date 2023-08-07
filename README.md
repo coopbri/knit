@@ -18,13 +18,13 @@ for managing `package.json` dependencies. `knit` creates a `knit.lock` file in y
 Install locally in a project (replace `yarn` with your preferred package manager):
 
 ```sh
-yarn add -D knit
+yarn add -D @omnidev/knit
 ```
 
 Or execute it directly and ephemerally with `yarn dlx`:
 
 ```sh
-yarn dlx knit [...]
+yarn dlx @omnidev/knit [...]
 ```
 
 ## Key Commands
