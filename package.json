@@ -1,6 +1,6 @@
 {
   "name": "@omnidev/knit",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "🧶 Knit local dependencies together",
   "license": "MIT",
   "homepage": "https://github.com/coopbri/knit",
