@@ -10,7 +10,11 @@
   },
   "main": "build/knit.js",
   "module": "build/knit.mjs",
+  "types": "build/knit.d.ts",
   "bin": "build/knit.js",
+  "files": [
+    "build"
+  ],
   "exports": {
     ".": {
       "require": "./build/knit.js",
