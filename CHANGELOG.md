@@ -1,5 +1,11 @@
 # @omnidev/knit
 
+## 0.1.2
+
+### Patch Changes
+
+- [#5](https://github.com/coopbri/knit/pull/5) [`b9558e7`](https://github.com/coopbri/knit/commit/b9558e72f42726c06da86c8bb46e03decf4a9505) Thanks [@coopbri](https://github.com/coopbri)! - Remove unused dependencies
+
 ## 0.1.1
 
 ### Patch Changes
