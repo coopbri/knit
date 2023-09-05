@@ -1,7 +1,5 @@
 # 🧶 Knit
 
-> ⚠️ **WARNING: This project was recently forked, and I have plans to significantly diverge from and improve upon the original project. Please bear with me while I familiarize myself with the codebase and upgrade the dependencies and engineering processes (CI, etc.).**
-
 > Streamline your local Node.js package dependency workflow.
 
 Knit is a fork of [yalc](https://github.com/wclr/yalc), which was created by [@wclr](https://github.com/wclr). The name is inspired by this GitHub [thread](https://github.com/yarnpkg/yarn/issues/1213).
