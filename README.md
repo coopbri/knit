@@ -189,4 +189,4 @@ sig=false
 
 ## License
 
-The code in this repository is licensed under MIT, &copy; Brian Cooper. The original [yalc](https://github.com/wclr/yalc) work is licensed under MIT &copy; Alex Osh. See <a href="LICENSE.md">LICENSE.md</a> for more information.
+The code in this repository is licensed under MIT, &copy; Brian Cooper. The original [yalc](https://github.com/wclr/yalc) work is licensed under MIT, &copy; Alex Osh. See <a href="LICENSE.md">LICENSE.md</a> for more information.
