@@ -13,14 +13,16 @@ const validFlags = [
 
 const fileName = ".knitrc";
 
-const readFile = (): Record<string, string | boolean> | null => {
+type Config = Record<string, boolean>;
+
+const readFile = (): Config | null => {
   if (existsSync(fileName)) {
     return parse(readFileSync(fileName, "utf-8"));
   }
   return null;
 };
 
-export const readRcConfig = (): Record<string, string | boolean> => {
+export const readRcConfig = (): Config => {
   const rcOptions = readFile();
   if (!rcOptions) return {};
 

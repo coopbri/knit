@@ -41,6 +41,7 @@ if (process.argv.includes("--quiet") || rcArgs.quiet) {
 }
 
 const getPublishOptions = (
+  // TODO type
   argv: any,
   override: Partial<PublishPackageOptions> = {},
 ): PublishPackageOptions => {
@@ -139,7 +140,7 @@ void yargs
           showInstallations({ packages });
           break;
         case "clean":
-          await cleanInstallations({ packages, dry: argv.dry });
+          await cleanInstallations({ packages, dry: !!argv.dry });
           break;
         default:
           console.info("Need installation action: show | clean");
@@ -261,7 +262,7 @@ void yargs
       }
       checkManifest({
         commit: argv.commit,
-        all: argv.all,
+        all: !!argv.all,
         workingDir: process.cwd(),
       });
     },
