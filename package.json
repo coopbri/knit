@@ -34,7 +34,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@npmcli/arborist": "^6.3.0",
+    "@npmcli/arborist": "^7.0.0",
     "chalk": "4.1.0",
     "detect-indent": "6.1.0",
     "fs-extra": "^11.1.1",
