@@ -1,7 +1,9 @@
 name: Release 🏗️
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Test 🧪"]
+    types: [completed]
     branches: [master]
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
@@ -10,8 +12,11 @@ jobs:
   release:
     name: Handle release 🦋
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'master' }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
       - uses: actions/setup-node@v4
         with:
           node-version: "18.x"
