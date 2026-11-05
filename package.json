@@ -38,7 +38,7 @@
     "chalk": "4.1.0",
     "detect-indent": "6.1.0",
     "fs-extra": "^11.1.1",
-    "glob": "^10.3.3",
+    "glob": "^14.0.0",
     "ignore": "^5.2.4",
     "ini": "^4.1.1",
     "npm-packlist": "^7.0.4",
